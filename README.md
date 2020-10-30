@@ -13,14 +13,20 @@ It installs a right-click options to read selected text, or you can use the exte
 
 ```json
 "permissions": [
-  "contextMenus", - Can ONLY access selected text in page when right-click menu item is selected.
-  "storage", - Settings are save and can be synced across machines if Chrome is configured to sync. API key is NOT synced
-  "alarms"  - This is actually deferred tasks. Used to free sounds from memory after N minutes.
+  "contextMenus", 
+  "storage",
+  "alarms"
 ],
   "optional_permissions": [
-  "clipboardRead",         - Used to play the contents of the clipboard. Useful when page take over right-click menu
-  "notifications",         - used if the person wants to be warned when approaching quota limits (todo)
+  "clipboardRead",
+  "notifications",
 ],
 ```
 
-
+|   Permission   | Usage                      |
+|----------------|----------------------------|
+|`contextMenus`  | Can ONLY access selected text in page when right-click menu item is selected.|
+|`   storage`    | Settings are save and can be synced across machines if Chrome is configured to sync. API key is NOT synced|
+|   `alarms`     | This is an alternative to setTimeout that is background.js unload friendly|
+|`clipboardRead` | Used to play the contents of the clipboard. Useful when page take over right-click menu|
+|`notifications` | Used if the person wants to be warned when approaching quota limits (todo)
