@@ -1,0 +1,24 @@
+/** improve readable **/
+html {
+    line-height: 1.6;
+    font-family: Roboto, "Open Sans", serif;
+    padding: 23px;
+}
+
+.logo {
+    width: 42px;
+    height: 42px;
+}
+
+.icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 3px;
+}
+
+figure {
+    max-width: 650px;
+    padding-left: 23px;
+}

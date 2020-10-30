@@ -1,0 +1,139 @@
+/** https://minicss.org/docs#cards **/
+
+/** improve readable **/
+html {
+    line-height: 1.6;
+    font-family: Roboto, "Open Sans", serif;
+    padding: 23px;
+}
+
+.logo {
+    width: 42px;
+    height: 42px;
+}
+
+label {
+    font-variant-caps: small-caps;
+}
+
+input, select {
+    width: 27em;
+}
+
+textarea {
+    width: 100%;
+}
+
+.icon {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    top: 6px;
+}
+
+.passwordvisabilityicon {
+    position: relative;
+    left: -3em;
+    z-index: 20;
+}
+
+.row {
+    min-height: 47px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Range Label */
+.range-slider {
+    margin: 60px 0 0 0;
+}
+
+.range-slider {
+    width: 100%;
+}
+
+.range-slider__range {
+    -webkit-appearance: none;
+    width: calc(100% - (73px));
+    height: 10px;
+    border-radius: 5px;
+    background: #d7dcdf;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+.range-slider__range::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2c3e50;
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+}
+.range-slider__range::-webkit-slider-thumb:hover {
+    background: #1abc9c;
+}
+.range-slider__range:active::-webkit-slider-thumb {
+    background: #1abc9c;
+}
+.range-slider__range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 50%;
+    background: #2c3e50;
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+}
+.range-slider__range::-moz-range-thumb:hover {
+    background: #1abc9c;
+}
+.range-slider__range:active::-moz-range-thumb {
+    background: #1abc9c;
+}
+.range-slider__range:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 6px #1abc9c;
+}
+
+.range-slider__value {
+    display: inline-block;
+    position: relative;
+    width: 60px;
+    color: #fff;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 3px;
+    background: #2c3e50;
+    padding: 5px 10px;
+    margin-left: 8px;
+}
+
+.range-slider__value:after {
+    position: absolute;
+    top: 8px;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-right: 7px solid #2c3e50;
+    border-bottom: 7px solid transparent;
+    content: "";
+}
+
+/** Modal dialog width **/
+
+.dialog-card {
+    max-width: 450px;
+}
+
+.center-p {
+    text-align:center;
+}
+
+
+.voice-names-list-input {
+    width: 23em;
+}

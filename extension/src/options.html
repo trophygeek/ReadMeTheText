@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ReadMeTheText</title>
+  <link rel="stylesheet" type="text/css" href="thirdparty/mini-default.css">
+  <link rel="stylesheet" type="text/css" href="options.css">
+</head>
+
+<!-- useful: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form -->
+<body>
+<!-- svg library used by page https://material.io/resources/icons/?style=baseline -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px">
+  <defs>
+    <g id="launch-icon">
+      <path d="M0 0h24v24H0z" fill="none"/>
+      <path
+          d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+    </g>
+
+    <g id="eye-show">
+      <path d="M0 0h24v24H0z" fill="none"/>
+      <path
+          d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </g>
+
+    <g id="eye-hide">
+      <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
+      <path
+          d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+    </g>
+
+    <g id="delete">
+      <path d="M0 0h24v24H0z" fill="none"/>
+      <path
+          d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+    </g>
+  </defs>
+</svg>
+
+<div class="row">
+  <div class="col-md-2">
+    <img src="../icons/icon_128.png" class="logo" alt="Logo">ReadMeTheText
+  </div>
+  <div class="col-md-10">
+    <div id="keyrequiredmsg" class="card fluid warning hidden">
+      <div class="inline-block">
+        <mark class="secondary">API Key Required</mark>
+        <div class="col-md-offset-1">
+          This extension requires a Google text-to-speech api key,
+          It WILL NOT WORK without a key.
+        </div>
+        <div class="col-md-offset-1">
+          <!-- todo: generate this link in js dynamically -->
+          <a href="chrome-extension://amgdfpkjgcdgofgaanclahjickdjpicn/src/setuphelp.html" target="_blank">See how to get your own key from Google for free
+            <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
+              <use xlink:href="#launch-icon"></use>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<form>
+  <fieldset>
+    <legend>Your personal Text-to-Voice Google's API Key</legend>
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="apiKey">Text-to-Voice API Key</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <input type="password" class="form-control" id="apiKey" required aria-required="true"
+               aria-label="Text box to enter your Google text-to-voice api key"
+               placeholder="[your personal google api key required]">
+
+        <svg id="shownpasswordicon" viewBox="0 0 24 24" class="icon passwordvisabilityicon hidden" fill="#2c3e50"
+             aria-hidden="false" tabindex="0" aria-label="Click to hide key text field with bullet characters">
+          <use xlink:href="#eye-show"></use>
+        </svg>
+        <svg id="hiddenpasswordicon" viewBox="0 0 24 24" class="icon passwordvisabilityicon" fill="#2c3e50"
+             aria-hidden="false" tabindex="0" aria-label="Click to show key text field with bullet characters">
+          <use xlink:href="#eye-hide"></use>
+        </svg>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <p>You get a <b>limited</b>, free quota with your API Key.<br>
+      It's recommended you explore voices and settings for free on Google's site.
+    </p>
+    <div class="col-md-offset-1">
+      <p><a href="https://cloud.google.com/text-to-speech/pricing" target="_blank">Google's Pricing and Free-tier info
+        <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
+          <use xlink:href="#launch-icon"></use>
+        </svg>
+      </a></p>
+
+      <p><a href="https://cloud.google.com/text-to-speech/docs/voices"
+            target="_blank">Full list of voices
+        <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
+          <use xlink:href="#launch-icon"></use>
+        </svg>
+      </a></p>
+      <p><a href="https://cloud.google.com/text-to-speech#section-2"
+            target="_blank">Text-to-speech Speak-it demo
+        <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
+          <use xlink:href="#launch-icon"></use>
+        </svg>
+      </a></p>
+
+    </div>
+  </fieldset>
+</form>
+<form>
+  <fieldset>
+    <legend>Select and control voice</legend>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="langselect">1. Language</label></div>
+      <div class="col-sm-12 col-md">
+        <select name="langselect" id="langselect" class="form-control"></select>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="voiceModel">2. Voice Model Type</label></div>
+      <div class="col-sm-12 col-md">
+        <select name="voiceModel" id="voiceModel" class="form-control"></select>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="voiceids">3. Voice</label></div>
+      <div class="col-sm-12 col-md">
+        <select name="voiceids" id="voiceids" class="form-control"></select>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="pitch">Sound Pitch of the voice</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <input id="pitch" type="range" min="-20.0" max="20.0" value="0" step="0.25"
+               class="slider form-control">
+        <span class="range-slider__value" for="pitch">1</span> (default 0.0)
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="speakingRate">Speaking speed (rate)</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <input id="speakingRate" type="range" min="0.25" max="4.00" value="1.0" placeholder="1.0" step="0.05"
+               class="slider form-control">
+        <span class="range-slider__value" for="speakingRate">0</span> (default 1.0)
+      </div>
+    </div>
+
+  </fieldset>
+</form>
+
+<form>
+  <fieldset>
+    <legend>Geeky controls</legend>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="effectsProfileId">Audio output device profile</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <select id="effectsProfileId">
+          <option selected value="wearable-class-device">Smart watches and other wearables</option>
+          <option selected value="handset-class-device">Smartphones, handsets</option>
+          <option selected value="headphone-class-device">Earbuds or headphones</option>
+          <option selected value="small-bluetooth-speaker-class-device">Small home speakers</option>
+          <option selected value="medium-bluetooth-speaker-class-device">Medium home speakers</option>
+          <option selected value="large-home-entertainment-class-device">Large home speakers, entertainment systems
+          </option>
+          <option selected value="large-automotive-class-device">Car speakers</option>
+          <option selected value="telephony-class-application">Interactive Voice Response (IVR) systems</option>
+        </select>
+      </div>
+    </div>
+
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="audioEncoding">Audio Encoding Type</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <select id="audioEncoding" class="form-control">
+          <option selected value="MP3">MP3 32bit (lower bandwidth)</option>
+          <option selected value="MP3_64_KBPS">MP3 64bit (higher quality)</option>
+          <option selected value="LINEAR16">LINEAR16</option>
+        </select>
+      </div>
+    </div>
+
+  </fieldset>
+</form>
+
+<form>
+  <fieldset>
+    <legend>Test Settings</legend>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md">
+        <textarea id="textTextArea" aria-label="Text for testing settings"
+                  placeholder="Text for testing settings"></textarea>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-4 col-md">
+        <div class="button-group" role="group" aria-label="playback controls">
+          <button id="playtestsound" role="button" type="button">Test Text-to-speech</button>
+<!--          <button id="savesound" role="button" type="button">Save...</button>-->
+        </div>
+      </div>
+      <div class="col-sm-8 col-md">
+      </div>
+    </div>
+
+  </fieldset>
+</form>
+
+<form>
+  <p>Google allows for a limited number of free words every month (counted by characters). This is known as a quota.
+    Once this quota is exceeded, Google starts charging.
+  </p>
+
+  <p>The quota counter in this extension is only an <b>approximate</b> count. It's not exact and only gives a
+    rough idea of how many characters have been sent to Google.</p>
+
+  <p>Currently, there is no automated way (API) to get the actual current usage from Google.</p>
+
+  <p><mark class="secondary">IMPORTANT</mark><b> Quotas and rates are subject to change by Google</b>. This beta extension may be out of date!
+    <a href="https://cloud.google.com/text-to-speech/pricing" target="_blank">See pricing list
+      <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
+        <use xlink:href="#launch-icon"></use>
+      </svg>
+    </a></p>
+
+  <fieldset>
+    <legend>Quotas Tracker (Approximate) </legend>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="quotaValueStd">Characters Standard: </label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <span id="quotaValueStd" aria-label="Quota used value">0</span>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="quotaValueWave">Characters Wavenet: </label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <span id="quotaValueWave" aria-label="Quota used value">0</span>
+      </div>
+    </div>
+
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="quotaLastReset">Quota last reset: </label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <span id="quotaLastReset" aria-label="Quota reset on date"></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-row">
+    <!-- keep the following html together for modal to work see https://minicss.org/docs#modal-dialogs -->
+    <label for="confirmQuotaReset" class="button">Reset Quota Counter...</label>
+    <input type="checkbox" id="confirmQuotaReset" class="modal" aria-label="show dialog to confirm resetting quota counting data" >
+    <div role="dialog" aria-labelledby="dialog-title">
+      <div class="card dialog-card">
+        <label for="confirmQuotaReset" class="modal-close"></label>
+        <h3 class="section" id="dialog-title">Confirm resetting quota tracking.</h3>
+        <p class="section">You are about to clear quota data.
+          This should be done once a month as your Google text-to-speech quota is reset.</p>
+        <p class="center-p">
+          <label for="confirmQuotaReset" class="button">cancel</label>
+          <label for="confirmQuotaReset" id="quotaResetBtn" class="button">OK clear data</label>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+<script type="module" src="options.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ReadMeTheText</title>
+  <link rel="stylesheet" type="text/css" href="thirdparty/mini-default.css">
+  <link rel="stylesheet" type="text/css" href="setuphelp.css">
+</head>
+
+<body>
+<div id="doc-wraper" class="row">
+  <main id="doc-content" class="col-sm-12 col-md-12 col-lg-11">
+    <div id="intro" class="card fluid">
+      <h2 class="section double-padded"><img src="../icons/icon_128.png" class="logo" alt="Logo">
+        Instructions for getting your own API key directly from Google</h2>
+      <div class="section">
+        <p>
+          <mark class="do">NOTE</mark>
+          This information is based on the beta version of Google's text-to-speech service (Oct
+          2020). It may get out of date over time.
+        </p>
+
+        <div class="row">
+          <p>
+            This extension uses Google's amazing text-to-speech service; however, that Google service is only free for a
+            limited
+            amount of text, then it switches to a per-character cost.
+          </p>
+
+          <p>
+            The good news is that you'll not likely go over the generous free-quota; however, Google gives you a $300
+            credit for the first few months to figure costs out.
+          </p>
+
+          <p>
+          <h5>Steps: </h5>
+
+          <ol>
+            <li>Sign up for a free Google Cloud account</li>
+            <li>Create a project</li>
+            <li>Enable Text-to-Speech API</li>
+            <li>Generate a Text-to-Speech API Key</li>
+            <li>Input your key into this extension</li>
+            <li>Set up budget alerts<br>
+              <mark class="secondary">DON'T</mark>
+              Share your API key with anyone else.
+            </li>
+          </ol>
+          </p>
+        </div>
+      </div>
+
+      <br>
+    </div>
+
+    <div id="step1" class="card fluid">
+      <h2 class="section double-padded">Step 1. Sign up for a free Google Cloud account</h2>
+
+      <p class="section">
+        To sign up for Google Cloud, you may need to provide a credit card to Google.
+        This is primarily to help stop abuse and you should a free credit from Google to start.
+      <br>
+        <a href="https://cloud.google.com/gcp/" target="googlecloud" class="button tertiary bordered">Sign up
+        </a>
+
+      <figure>
+        <img src="../img/signup1.png" alt="Google Cloud's signup screen"/>
+      </figure>
+
+
+      <ul>
+        <li>
+          Click the button and follow the steps on the google site. You will need a Google gmail account and
+          be logged into it.
+        </li>
+      </ul>
+      </p>
+
+    </div>
+
+    <br>
+
+    <div id="step2" class="card fluid">
+      <h2 class="section double-padded">Step 2. Create a new project on Google Cloud</h2>
+
+      <p class="section">
+        Everything in Google Cloud need to be in a project. The name doesn't matter other than to help you identify
+        it.
+<br>
+        <a href="https://console.cloud.google.com/projectcreate" target="googlecloud"
+           class="button tertiary bordered">Create a new project
+        </a>
+
+        <br>
+
+        <figure>
+          <img src="../img/createproject2.png" alt="Google cloud's create project screen"/>
+        </figure>
+
+      <ol>
+        <li>Enter a project name</li>
+        <li>Click Create button</li>
+      </ol>
+      </p>
+
+      <p class="section">
+        After creating, you're dropped onto the project dashboard.
+        Just make sure the project at the top is set to your newly created one.
+      <br>
+
+      <figure>
+        <img src="../img/createproject3.png" alt="Verify correct project is selected"/>
+      </figure>
+      </p>
+    </div>
+
+    <br>
+
+    <div id="step3" class="card fluid">
+      <h2 class="section double-padded">Step 3. Enable Text-to-Speech API</h2>
+      <p class="section">
+        <a href="https://console.developers.google.com/apis/api/texttospeech.googleapis.com/overview"
+           target="googlecloud"
+           class="button tertiary bordered">Enable Text-to-Speech API
+        </a>
+   <br>
+        <figure>
+          <img src="../img/enable-api4.png" alt="Enable the api"/>
+        </figure>
+
+      <ol>
+        <li>Verify project at top</li>
+        <li>Click Enable button</li>
+      </ol>
+      </p>
+      <p class="section">
+        It takes a few seconds, but after the API is enable, you're redirect to an API Dashboard.
+        You'll want to bookmark this page for later references.
+        <figure>
+          <img src="../img/enable-api5.png" alt="Verify correct project is selected"/>
+        </figure>
+      </p>
+    </div>
+
+
+    <div id="step4" class="card fluid">
+      <h2 class="section double-padded">Step 4. Generate an API Key</h2>
+      <p class="section">
+        The API Key is a <strong>secret</strong> code that controls who can use your
+        text-to-speech. If you give this to anyone, they can use your speaking service and you'll get charged.
+      <br>
+
+        <a href="https://console.developers.google.com/apis/credentials/key"
+           target="googlecloud"
+           class="button tertiary bordered">Generate an API Key
+        </a>
+
+        <figure>
+          <img src="../img/api-key6.png" alt="Creating api key screen"/>
+        </figure>
+
+      <ol>
+        <li>Enter any name. Since you'll be using for this entension, something like <code>ReadMeTheText Ext</code> is good.</li>
+        <li>For restrictions, the easiest solution is to enter none.</li>
+        <li>Do not click create just yet.</li>
+      </ol>
+      </p>
+
+      <p class="section">
+        <figure>
+          <img src="../img/api-key7.png" alt="Creating api key screen"/>
+        </figure>
+
+      <ol>
+        <li>Click the API Restrictions tab</li>
+        <li>Select <code>Cloud Text-to-Speech API</code> from <code>API Restrictions dropdown</code></li>
+      </ol>
+      </p>
+
+      <p class="section">
+        <figure>
+          <img src="../img/api-key8.png" alt="Creating api key screen"/>
+        </figure>
+
+      <ol>
+        <li>Verify <code>Cloud Text-to-Speech</code> appears in the list</li>
+        <li>Click Create button</li>
+      </ol>
+      </p>
+
+    </div>
+
+    <br>
+
+    <div id="step5" class="card fluid">
+      <h2 class="section double-padded">Step 5. Copy API Key and add to extention</h2>
+      <p class="section">
+        After the key is generated, you will land on the Key Managenment page.
+
+        <figure>
+          <img src="../img/api-key9.png" alt="Copy API key"/>
+        </figure>
+
+      <ol>
+        <li>Click the copy icon to copy it to your clipboard</li>
+        <li>Open this extension's Options page and paste it into the correct field
+        </li>
+      </ol>
+      <p class="section">
+        <a href="chrome-extension://amgdfpkjgcdgofgaanclahjickdjpicn/src/options.html"
+           target="_blank"
+           class="button tertiary bordered">Open Options page
+        </a>
+<br>
+      <figure>
+        <img src="../img/api-key10.png" alt="Copy API key"/>
+      </figure>
+      </p>
+
+
+      <p class="section">
+        Scroll down and test that the api key works
+        <figure>
+          <img src="../img/test-11.png" alt="Test the API key"/>
+        </figure>
+      </p>
+    </div>
+
+    <div id="step6" class="card fluid">
+      <h2 class="section double-padded">Step 6. Create a Google Cloud Budget</h2>
+      <p class="section">
+        To make certain you don't spend too much money, you should consider creating
+        a Google Cloud Budget.
+      </p>
+      <p class="section">
+        <a href="https://cloud.google.com/billing/docs/how-to/budgets#create-budget"
+           target="googlecloud"
+           class="button tertiary bordered">Learn how to create a budget
+        </a>
+      </p>
+      <p class="section">
+        Instead of repeating the steps here, you should follow the instructions in
+        the offical Google guide.
+      </p>
+
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

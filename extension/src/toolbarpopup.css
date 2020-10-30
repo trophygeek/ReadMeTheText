@@ -1,0 +1,234 @@
+:root {
+    --progress-back-color: #ddd;
+    --progress-fore-color: #ffab00;
+    --button-back-color: var(--back-color);
+    --button-hover-back-color: #f3f3f3;
+}
+
+html {
+    /* background-color: #fafafa;*/
+    z-index: 4;
+}
+
+body {
+    margin: 0;
+}
+
+td {
+    text-align: center;
+}
+
+td * {
+    display: inline;
+}
+
+body {
+    width: 270px;
+    height: 400px
+}
+
+button {
+    cursor: pointer;
+    text-align: center;
+}
+
+table {
+    padding: 13px;
+    border: 13px;
+}
+
+.btn-custom {
+    margin-left: 7px;
+}
+
+.img-custom {
+    float: left;
+    zoom: 0.5;
+    margin: 7px;
+}
+
+.title {
+    font-weight: bolder;
+    border-bottom: 10px;
+}
+
+table {
+    border-collapse: separate;
+}
+
+.logo {
+    width: 32px;
+    height: 32px;
+}
+
+label {
+    font-variant-caps: small-caps;
+}
+
+.disabled:hover {
+
+}
+
+.bottom-padding-title {
+    padding-bottom: 13px;
+}
+
+/* button group without the stacking behavior when it gets too narrow
+@media screen and (max-width: 767px) {
+*/
+.button-group-row {
+    display: flex;
+    flex-direction: row;    /* toolbar is narrow by definition*/
+    border: 0.0625rem solid var(--button-group-border-color);
+    border-radius: var(--universal-border-radius);
+    margin: var(--universal-margin);
+}
+
+.button-group-row > button, .button-group-row [type="button"], .button-group-row > [type="submit"], .button-group-row > [type="reset"],
+.button-group-row > .button, .button-group-row > [role="button"] {
+    margin: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+    text-align: center;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/*.button-group-row > :not(:first-child) {*/
+/*    !*border: 0;*!*/
+/*    border-top: 0.0625rem solid var(--button-group-border-color);*/
+/*}*/
+
+
+.my-btn-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 150%;
+    padding: 0;
+    border: 0;
+    text-align: center;
+}
+
+
+.animationbase {
+    overflow: hidden;
+    /* animation-name: pulseanimationbk; */
+    animation-duration: 1.5s;
+    animation-timing-function: ease-out;
+    animation-direction: normal;
+    animation-iteration-count: infinite;
+    animation-play-state: running;
+}
+
+/* mix in with animationbase */
+.animationbk {
+    animation-name: pulseanimationbk;
+}
+
+.animationscale {
+    animation-name: pulseanimationscale;
+}
+
+
+@keyframes pulseanimationcolor {
+    0% {
+        color: #28a745;
+    }
+    50% {
+        color: #1dff4b; /* transform: scale(.9); */
+    }
+    100% {
+        color: #28a745;
+    }
+}
+
+@keyframes pulseanimationbk {
+    0% {
+        background-color: #28a745;
+        border-radius: 2%
+    }
+    50% {
+        background-color: #1dff4b;
+        border-radius: 5%;
+        box-shadow: 0 0 5px 5px rgba(29, 255, 75, 0.8);
+    }
+    100% {
+        background-color: #28a745;
+        border-radius: 2%
+    }
+}
+
+@keyframes pulseanimationscale {
+    0% {
+        transform: scale(1.2);
+    }
+    50% {
+        transform: scale(.8);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+/** progress bar related **/
+.progress {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    line-height: 0;
+    font-size: 0.703125rem;
+    background-color: var(--progress-back-color);
+    border-radius: 0.25rem;
+}
+
+.progress-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    background-color: var(--progress-back-color);
+    transition: width 0.6s ease;
+}
+
+.progress-bar-tweaks {
+    width: 32rem;
+    height: 32px;
+    border: solid 1px var(--progress-fore-color);
+    background: var(--progress-back-color);
+}
+
+.progress-indicator-tweaks {
+    width: 0;
+    height: 100%;
+    background-color: var(--progress-fore-color);
+    transition: all .5s linear;
+}
+
+.progress-text {
+    line-height: 200%;
+    font-weight: bold;
+    overflow: visible;
+    margin: 3em;
+    z-index: 5;
+}
+
+/* used to read the clipboard out loud */
+textarea.sandbox {
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    top: -100px;
+}
+
+.icon-button {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    top: 6px;
+}
