@@ -30,40 +30,6 @@ try {
     }
   };
 
-  /**
-   // Range Label
-   .range-slider__value {
-      display: inline-block;
-      position: relative;
-      width: $range-label-width;
-      color: $shade-0;
-      line-height: 20px;
-      text-align: center;
-      border-radius: 3px;
-      background: $range-label-color;
-      padding: 5px 10px;
-      margin-left: 8px;
-
-      &:after {
-        position: absolute;
-        top: 8px;
-        left: -7px;
-        width: 0;
-        height: 0;
-        border-top: 7px solid transparent;
-        border-right: 7px solid $range-label-color;
-        border-bottom: 7px solid transparent;
-        content: '';
-      }
-    }
-
-   <div class="range-slider">
-   <input id="maxvalue" class="range-slider__range" type="range" value="100" min="0" max="500">
-   <span class="range-slider__value" for=">0</span>
-   </div>
-
-   */
-
   let debounceSave_t = 0;
 
   function debounceSave(wait = 250) {
