@@ -1,3 +1,4 @@
+'use strict';
 import {
   logerr,
   trace,
@@ -47,7 +48,7 @@ export const StateBus = {
    */
   _data: {
     /** @var {string} */
-    current_state: 'IDLE', // PLAYBACKSTATE.IDLE
+    current_state: 'NOKEY', // PLAYBACKSTATE.NOKEY
     /** @var {string} */
     lasterr: '',
   },
@@ -73,26 +74,27 @@ export const StateBus = {
   /**
    * @param newvalue {String} should be PLAYBACKSTATE
    */
-  set currentState(newvalue) {
+  async setCurrentState(newvalue) {
     console.assert(typeof newvalue === 'string');
     if (StateBus._data.current_state === newvalue) {
       return;
     }
     StateBus._data.current_state = newvalue;
     // We know we're NOT awaiting, fire and forget.
-    asycChromeExt.setLocalStorageData(StateBus.KEY, StateBus._data);
+    await asycChromeExt.setLocalStorageData(StateBus.KEY, StateBus._data);
   },
-  
-  get lastError() {
+
+  getLastError() {
     return StateBus._data.lasterr;
   },
-  set lastError(errstr) {
+  async setLastError(errstr) {
     // humm... save? Maybe better to combine with currentState for efficiency.
     StateBus._data.lasterr = errstr;
     if (errstr !== '') {
-      StateBus.currentState = PLAYBACKSTATE.ERROR;
+      await StateBus.setCurrentState(PLAYBACKSTATE.ERROR);
     }
   },
+
   clearLastError() {
     StateBus._data.lasterr = '';
     asycChromeExt.setLocalStorageData(StateBus.KEY, StateBus._data);
@@ -198,6 +200,7 @@ export const Settings = {
   _data_local_only: {
     _unique_instance_id: '',   // this is used by quota syncing so prevent incr collisions across browser instances.
     _apikey: '',  // use accessor
+    _asked_allow_notifications: false, // this is here because each install needs to ask for permission.
   },
 
   /**
@@ -510,7 +513,7 @@ export const QuotaTracker = {
     });
   },
 
-  async addChangedListener(changefn) {
+  addChangedListener(changefn) {
     QuotaTracker._change_callbacks.push(changefn);
   },
 

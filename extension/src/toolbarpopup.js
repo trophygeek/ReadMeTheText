@@ -6,61 +6,80 @@ import {VOICEMODEL} from "./voiceslist.js";
 
 class Toolbarpopup {
 
-  currentstate = PLAYBACKSTATE.IDLE;
-  playbackbtn = null;
-  stopbtn = null;
-  optionsbtn = null;
-  clipboardbtn = null;
-  qualitytype = null;
+  _currentstate = PLAYBACKSTATE.IDLE;
+  
+  /** @var {Element} **/
+  _playbackbtn = null;
+  /** @var {Element} **/
+  _stopbtn = null;
+  /** @var {Element} **/
+  _optionsbtn = null;
+  /** @var {Element} **/
+  _clipboardbtn = null;
+  /** @var {Element} **/
+  _qualitytypelabel = null;
+  /** @var {Element} **/
   optionsrequiredbtn = null;
+  /** @var {Element} **/
+  _keyrequiredmsg = null;
+  /** @var {Element} **/
+  _errmsg = null;
+  /** @var {Element} **/
+  _errmsgtext = null;
 
-
+  /** this is called by the StateBus when our state changes **/
   async updatePlaybackState() {
     try {
       const playbackstate = StateBus.currentState;
-      trace(`updatePlaybackState  '${this.currentstate}' => '${playbackstate}'`);
-      this.currentstate = playbackstate;
+      trace(`updatePlaybackState  '${this._currentstate}' => '${playbackstate}'`);
 
+      this._currentstate = playbackstate;
+
+      // states where playing is disabled
+      if ([PLAYBACKSTATE.NOKEY, PLAYBACKSTATE.IDLE, PLAYBACKSTATE.ERROR].includes(playbackstate)) {
+        this._playbackbtn.disabled = true;
+        this._playbackbtn.classList.remove('activate', 'animationbase', 'animationbk');
+        this._playbackbtn.setAttribute("aria-pressed", "false");
+
+        this._stopbtn.disabled = true;
+        this._stopbtn.classList.remove('activate');
+        this._stopbtn.setAttribute("aria-pressed", "false");
+      } else {
+        // states where playing is enabled
+        this._playbackbtn.disabled = false;
+        this._playbackbtn.classList.add('activate', 'animationbase', 'animationbk');
+        this._playbackbtn.setAttribute("aria-pressed", "true");
+
+        this._stopbtn.disabled = false;
+        this._stopbtn.classList.remove('activate');
+        this._stopbtn.setAttribute("aria-pressed", "false");
+      }
+
+      // states where play-from-clipboard are disabled/enabled
+      this._clipboardbtn.disabled = ([PLAYBACKSTATE.NOKEY].includes(playbackstate));
+
+      // show/hide alert mesages
       switch (playbackstate) {
-        case PLAYBACKSTATE.IDLE:
-          this.playbackbtn.classList.remove('activate', 'animationbase', 'animationbk');
-          this.playbackbtn.disabled = true;
-          this.playbackbtn.setAttribute("aria-pressed", "false");
-          this.playbackbtn.disabled = true;
-
-          this.stopbtn.disabled = true;
-          this.stopbtn.classList.remove('activate');
-          this.stopbtn.setAttribute("aria-pressed", "false");
+        case PLAYBACKSTATE.NOKEY:
+          this._keyrequiredmsg.classList.remove('hidden');
+          this._errmsg.classList.add('hidden');// don't show both
           break;
 
-        case PLAYBACKSTATE.PLAYING:
-          this.playbackbtn.disabled = false;
-          this.playbackbtn.classList.add('activate', 'animationbase', 'animationbk');
-          this.playbackbtn.setAttribute("aria-pressed", "true");
-
-          this.stopbtn.disabled = false;
-          this.stopbtn.classList.remove('activate');
-          this.stopbtn.setAttribute("aria-pressed", "false");
+        case PLAYBACKSTATE.ERROR:
+          const lasterr = StateBus.getLastError();
+          if (lasterr !== '') {
+            this._errmsg.classList.remove('hidden');
+            this._keyrequiredmsg.classList.add('hidden'); // don't show both
+            this._errmsgtext.innerText = lasterr;
+          }
           break;
 
-        case PLAYBACKSTATE.PAUSED:
-          this.stopbtn.disabled = false;
-          this.playbackbtn.classList.remove('disabled', 'activate', 'animationbase', 'animationbk');
-          this.playbackbtn.setAttribute("aria-pressed", "false");
-
-          this.stopbtn.disabled = false;
-          this.stopbtn.classList.remove('activate');
-          this.stopbtn.setAttribute("aria-pressed", "false");
-          break;
-
-        case PLAYBACKSTATE.STOPPED:
-          this.playbackbtn.disabled = false;
-          this.playbackbtn.classList.remove('activate', 'animationbase', 'animationbk');
-          this.playbackbtn.setAttribute("aria-pressed", "false");
-
-          this.stopbtn.disabled = false;
-          this.stopbtn.classList.add('activate');
-          this.stopbtn.setAttribute("aria-pressed", "true");
+        default:
+          // hide all the message
+          this._errmsg.classList.add('hidden');
+          if (Settings.apiKey.length > 32) {
+            this._keyrequiredmsg.classList.add('hidden');
+          }
           break;
       }
     } catch (err) {
@@ -91,7 +110,6 @@ class Toolbarpopup {
     $('#progresstext').innerHTML = status_text;
   }
 
-
   async refreshQuotaUi() {
     const voiceattr = splitvoicename(Settings.currentVoiceName);
     const totals = await QuotaTracker.get_quota_totals();
@@ -110,7 +128,7 @@ class Toolbarpopup {
         break;
     }
     // todo: draw lines for warning locations?
-    this.qualitytype.innerHTML = `${voiceattr.voiceModel}`;
+    this._qualitytypelabel.innerHTML = `${voiceattr.voiceModel}`;
     const totalstr = Intl.NumberFormat().format(total);
     const maxstr = Intl.NumberFormat().format(max);
     this._setprogressbar(total / max, `${totalstr} of ${maxstr}`);
@@ -136,40 +154,46 @@ class Toolbarpopup {
     return result;
   }
 
+  _checkIfEmptyKey() {
+    if (Settings.apiKey.length < 32) {
+      this._keyrequiredmsg.classList.remove('hidden');
+    } else {
+      this._keyrequiredmsg.classList.add('hidden');
+    }
+  }
+
   async onload() {
     try {
       await Settings.init();
       await StateBus.init(this.updatePlaybackState.bind(this));
       await QuotaTracker.init();
 
-      this.playbackbtn = $('#playbackbtn');
-      this.stopbtn = $('#stopbtn');
-      this.optionsbtn = $('#optionsbtn');
-      this.clipboardbtn = $('#clipboardbn');
-      this.qualitytype = $('#qualitytype');
-      this.optionsrequiredbtn = $('#options_required');
+      this._playbackbtn = $('#playbackbtn');
+      this._stopbtn = $('#stopbtn');
+      this._optionsbtn = $('#optionsbtn');
+      this._clipboardbtn = $('#clipboardbn');
+      this._qualitytypelabel = $('#qualitytypelabel');
+      this._optionsrequiredbtn = $('#options_required');
+      this._keyrequiredmsg = $('#keyrequiredmsg');
+      this._errmsg = $('#errmsg');
+      this._errmsgtext = $('#errmsgtext');
 
+
+      Settings.addChangedListener( this._checkIfEmptyKey.bind(this));
+      this._checkIfEmptyKey();
 
       await this.refreshQuotaUi();
+
       QuotaTracker.addChangedListener(async () => {
         trace('QuotaTracker change');
         await this.refreshQuotaUi();
       });
 
-      if (Settings.apiKey === '') {
-        $('#keyrequiredmsg').classList.remove('hidden');
-      }
-
-      if (StateBus.lastError !== '') {
-        $('#errmsg').classList.remove('hidden');
-        $('#errmsgtext').innerText = StateBus.lastError;
-      }
-
-      this.updatePlaybackState(); // set our initial UI state
+      await this.updatePlaybackState(); // set our initial UI state
 
       // clicking the play button
-      this.playbackbtn.addEventListener('click', (event) => {
-        switch (this.currentstate) {
+      this._playbackbtn.addEventListener('click', (event) => {
+        switch (this._currentstate) {
           case PLAYBACKSTATE.PLAYING:
             chrome.runtime.sendMessage({cmd: CMD.PAUSE});
             break;
@@ -181,19 +205,19 @@ class Toolbarpopup {
         }
       });
 
-      this.stopbtn.addEventListener('click', (event) => {
+      this._stopbtn.addEventListener('click', (event) => {
         chrome.runtime.sendMessage({cmd: CMD.STOP});
       });
 
-      this.optionsbtn.addEventListener('click', (event) => {
+      this._optionsbtn.addEventListener('click', (event) => {
         this._openOptionsPage();
       });
 
-      this.optionsrequiredbtn.addEventListener('click', (event) => {
+      this._optionsrequiredbtn.addEventListener('click', (event) => {
         this._openOptionsPage();
       });
 
-      this.clipboardbtn.addEventListener('click', async (event) => {
+      this._clipboardbtn.addEventListener('click', async (event) => {
         try {
           const granted = await asycChromeExt.chromePermssionsRequest(['clipboardRead']);
           if (granted) {
@@ -203,7 +227,7 @@ class Toolbarpopup {
             }
             chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: clipboard});
           }
-        } catch(err) {
+        } catch (err) {
           logerr(err, err.stack);
         }
       });

@@ -172,7 +172,16 @@ try {
         apikeyelem.addEventListener('change', async (evt) => {
           Settings.apiKey = apikeyelem.value.trim();
           updateKeyRequiredMsg();
-          debounceSave();
+          await Settings.save();    // do not debouce, always save asap.
+          $('#playtestsound').disabled = (Settings.apiKey.length < 32);
+        });
+
+        apikeyelem.addEventListener('keyup', (evt) => {
+          const val = evt.currentTarget.value.trim();
+          // allow the button to be click when the user just typed in apikey and the focus
+          // is still in the edit box (e.g. the 'change' event hasn't triggered yet).
+          $('#playtestsound').disabled = (val.length < 32);
+
         });
 
         $('#shownpasswordicon').addEventListener('click', () => {
@@ -274,10 +283,14 @@ try {
       };
 
       // Language Menu
-      langselect.addEventListener('change', async ({target}) => {await updateMenusFn(target);});
+      langselect.addEventListener('change', async ({target}) => {
+        await updateMenusFn(target);
+      });
 
       // voice model changed
-      voicemodelselect.addEventListener('change', async ({target}) => {await updateMenusFn(target);});
+      voicemodelselect.addEventListener('change', async ({target}) => {
+        await updateMenusFn(target);
+      });
 
       // voice names itself
       voiceids.addEventListener('change', async ({target}) => {
@@ -293,13 +306,15 @@ try {
         testtextelem.addEventListener('change', (event) => {
           const newtext = event.currentTarget.value;
           Settings.data.testText = newtext.trim();
-          playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey === '');
+          playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey.length < 32 );
           debounceSave();
         });
 
-        playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey === '');
+        playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey.length < 32);
         playtestsound.addEventListener('click', () => {
-          chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: testtextelem.value });
+          queueMicrotask( () => {
+            chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: testtextelem.value});
+          });
         });
       }
 
@@ -332,6 +347,15 @@ try {
           const datadiffstr = dateDiffDisplay(resetdate);
           quota_date_elem.innerText = `${datestr} (${datadiffstr})`;
         };
+
+        {  // fixup a href links that reference this extension with the correct id.
+          const fixupurls = document.querySelectorAll(`a[href^="chrome-extension:"]`);
+          const extid = chrome.runtime.id;
+          fixupurls.forEach((elem) => {
+            const url = elem.getAttribute('href').replace('chrome.runtime.id', extid);
+            elem.setAttribute('href', url);
+          });
+        }
 
         await updatefn();  // refresh now now
 

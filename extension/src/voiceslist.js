@@ -1,3 +1,4 @@
+'use strict';
 import {asycChromeExt, jsonParseSafe, logerr} from "./misc.js";
 import {DEFAULT_VOICES_DATA} from "./data_static.js";
 

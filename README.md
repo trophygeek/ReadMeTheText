@@ -30,7 +30,7 @@ Another common usage is reading an article or email in the background while I'm 
 ## Google Text-to-Speech is not free
 Google's text-to-speech uses a lot of backend resources. While Google does give a generous Free Tier allotment
 
->  [Google's Pricing and Free-tier info](https://cloud.google.com/text-to-speech/pricing) - latest update on pricing and quotas
+>  [Google's Pricing and Free-tier info](https://cloud.google.com/text-to-speech/pricing) - latest update on pricing and quotasgi
 
 >  [Full list of voices](https://cloud.google.com/text-to-speech/docs/voices) if you want to hear what each sounds like
 
@@ -49,7 +49,7 @@ You can install it from here [url]
 
 `packages.json` is only used to get the latest .ts (typescript) declaration files. These are used by modern IDEs to add basic type checking.
 
-`/extension/` is the extension's source
+`/extension/` is the extensios
 
 ## Extension's Manifest Permissions
 
@@ -79,8 +79,9 @@ For full transparency here are all the permissions in this extension and how the
 
 |   Permission   | Usage                      |
 |----------------|----------------------------|
-|`contextMenus`  | Can ONLY access selected text in page when right-click menu item is selected.|
+|`contextMenus`  | Can ONLY access selected text on a page when right-click menu item is selected.|
 |`   storage`    | Settings are saved and are synced across machines if Chrome is configured to do sync. Note: API key is NOT synced|
 |   `alarms`     | This is an alternative to setTimeout that is background.js unload large buffers to be more memory friendly|
 |`clipboardRead` | Used to text-to-speech the contents of the clipboard. Useful when page take over right-click menu|
 |`notifications` | Used if the person wants to be warned when approaching quota limits (todo)
+

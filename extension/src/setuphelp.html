@@ -32,15 +32,20 @@
           </p>
 
           <p>
-          <h5>Steps: </h5>
+            The good news is that you'll not likely go over the generous free-quota; however, Google gives you a $300
+            credit for the first few months to figure costs out.
+          </p>
+
+          <p>
+          <h4>Steps: </h4>
 
           <ol>
-            <li>Sign up for a free Google Cloud account</li>
-            <li>Create a project</li>
-            <li>Enable Text-to-Speech API</li>
-            <li>Generate a Text-to-Speech API Key</li>
-            <li>Input your key into this extension</li>
-            <li>Set up budget alerts<br>
+            <li><a href="#step1">Sign up for a free Google Cloud account</a></li>
+            <li><a href="#step2">Create a project</a></li>
+            <li><a href="#step3">Enable Text-to-Speech API</a></li>
+            <li><a href="#step4">Generate a Text-to-Speech API Key</a></li>
+            <li><a href="#step5">Input your key into this extension</a></li>
+            <li><a href="#step6">Set up budget alerts</a><br>
               <mark class="secondary">DON'T</mark>
               Share your API key with anyone else.
             </li>
@@ -52,7 +57,7 @@
       <br>
     </div>
 
-    <div id="step1" class="card fluid">
+    <div id="step1" name="step1" class="card fluid">
       <h2 class="section double-padded">Step 1. Sign up for a free Google Cloud account</h2>
 
       <p class="section">
@@ -79,7 +84,7 @@
 
     <br>
 
-    <div id="step2" class="card fluid">
+    <div id="step2" name="step2" class="card fluid">
       <h2 class="section double-padded">Step 2. Create a new project on Google Cloud</h2>
 
       <p class="section">
@@ -103,7 +108,7 @@
       </p>
 
       <p class="section">
-        After creating, you're dropped onto the project dashboard.
+        After creating a project, you're dropped onto the Project Dashboard.
         Just make sure the project at the top is set to your newly created one.
       <br>
 
@@ -115,9 +120,10 @@
 
     <br>
 
-    <div id="step3" class="card fluid">
+    <div id="step3" name="step3" class="card fluid">
       <h2 class="section double-padded">Step 3. Enable Text-to-Speech API</h2>
       <p class="section">
+        Next you'll need to enable the Text-to-Speech API for this project.<br>
         <a href="https://console.developers.google.com/apis/api/texttospeech.googleapis.com/overview"
            target="googlecloud"
            class="button tertiary bordered">Enable Text-to-Speech API
@@ -134,7 +140,7 @@
       </p>
       <p class="section">
         It takes a few seconds, but after the API is enable, you're redirect to an API Dashboard.
-        You'll want to bookmark this page for later references.
+        You'll want to bookmark this page for later use to check your quota use.
         <figure>
           <img src="../img/enable-api5.png" alt="Verify correct project is selected"/>
         </figure>
@@ -142,7 +148,7 @@
     </div>
 
 
-    <div id="step4" class="card fluid">
+    <div id="step4" name="step4" class="card fluid">
       <h2 class="section double-padded">Step 4. Generate an API Key</h2>
       <p class="section">
         The API Key is a <strong>secret</strong> code that controls who can use your
@@ -185,13 +191,14 @@
         <li>Verify <code>Cloud Text-to-Speech</code> appears in the list</li>
         <li>Click Create button</li>
       </ol>
+
       </p>
 
     </div>
 
     <br>
 
-    <div id="step5" class="card fluid">
+    <div id="step5" name="step5" class="card fluid">
       <h2 class="section double-padded">Step 5. Copy API Key and add to extention</h2>
       <p class="section">
         After the key is generated, you will land on the Key Managenment page.
@@ -202,12 +209,16 @@
 
       <ol>
         <li>Click the copy icon to copy it to your clipboard</li>
-        <li>Open this extension's Options page and paste it into the correct field
+        <li>Open this extension's Options page and paste it into the correct field<br>
+          <mark>Note</mark> If you ever need to get this key again, you can find it on the
+          <a target="googlecloud" href="https://console.developers.google.com/apis/credentials">Credentials Page</a>
         </li>
       </ol>
+      <br>
+
       <p class="section">
-        <a href="chrome-extension://amgdfpkjgcdgofgaanclahjickdjpicn/src/options.html"
-           target="_blank"
+        <a href="chrome-extension://chrome.runtime.id/src/options.html"
+           target="ext"
            class="button tertiary bordered">Open Options page
         </a>
 <br>
@@ -218,6 +229,7 @@
 
 
       <p class="section">
+
         Scroll down and test that the api key works
         <figure>
           <img src="../img/test-11.png" alt="Test the API key"/>
@@ -225,7 +237,7 @@
       </p>
     </div>
 
-    <div id="step6" class="card fluid">
+    <div id="step6" name="step6" class="card fluid">
       <h2 class="section double-padded">Step 6. Create a Google Cloud Budget</h2>
       <p class="section">
         To make certain you don't spend too much money, you should consider creating
@@ -238,13 +250,14 @@
         </a>
       </p>
       <p class="section">
-        Instead of repeating the steps here, you should follow the instructions in
-        the offical Google guide.
+        You should follow the instructions in this offical Google guide to set up a budget with warnings if
+        you exceed any cost.
       </p>
 
     </div>
 
   </main>
 </div>
+<script type="module" src="setuphelp.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "ReadMeTheText Beta",
   "short_name": "ReadMeTheText",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 2,
   "description": "Read text on a page using Google's high quality voices.",
   "homepage_url": "https://readmethetext.com/",
@@ -26,5 +26,6 @@
   "background": {
     "page": "src/background.html",
     "persistent": false
-  }
+  },
+  "content_security_policy": "default-src 'self'; connect-src https://texttospeech.googleapis.com"
 }
