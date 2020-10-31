@@ -127,14 +127,12 @@ export class classTextToSpeech {
 
    * @param text_to_speak
    * @param apikey string
-   * @param voicename string
    * @param audioConfig {audioEncoding:{string}, effectsProfileId:{string}, pitch: {string}, speakingRate: {string}}
    * @param voice {languageCode:{string}, name:{string}}
    * @return {Promise<{success: boolean, charactercount: number}>}
    */
   async apiFetchAudio(text_to_speak,
                       apikey = Settings.apiKey,
-                      voicename = Settings.currentVoiceName,
                       audioConfig = {
                         audioEncoding: Settings.data.audioEncoding,
                         effectsProfileId: Settings.data.effectsProfileId,

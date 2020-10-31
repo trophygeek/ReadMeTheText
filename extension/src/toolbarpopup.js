@@ -47,7 +47,8 @@ class Toolbarpopup {
       } else {
         // states where playing is enabled
         this._playbackbtn.disabled = false;
-        this._playbackbtn.classList.add('activate', 'animationbase', 'animationbk');
+        this._playbackbtn.classList.add('activate');
+        this._playbackbtn.classList.remove('animationbase', 'animationbk');
         this._playbackbtn.setAttribute("aria-pressed", "true");
 
         this._stopbtn.disabled = false;
@@ -60,6 +61,10 @@ class Toolbarpopup {
 
       // show/hide alert mesages
       switch (playbackstate) {
+        case PLAYBACKSTATE.PLAYING:
+          this._playbackbtn.classList.add('animationbase', 'animationbk');
+          break;
+
         case PLAYBACKSTATE.NOKEY:
           this._keyrequiredmsg.classList.remove('hidden');
           this._errmsg.classList.add('hidden');// don't show both

@@ -186,6 +186,8 @@ export const Settings = {
     // languageCode ... taken from voice_name
     // gender: comes from mapping the voice_name in the VoicesList2
 
+    rotate_voices: false,
+
     /**
      *  this one has an accessor since it keeps languageCode in sync. use Settings.currentVoiceName
      * @private

@@ -71,6 +71,19 @@ const playText = async (text = '') => {
 
     await gTxt2Speech.stopTrack();  // no overlap
 
+    // const {success, charactercount} = await apiFetchAudio(text_to_speak,
+    //     apikey = Settings.apiKey,
+    //     audioConfig = {
+    //       audioEncoding: Settings.data.audioEncoding,
+    //       effectsProfileId: Settings.data.effectsProfileId,
+    //       pitch: Settings.data.pitch,
+    //       speakingRate: Settings.data.speakingRate
+    //     },
+    //     voice = {
+    //       languageCode: Settings.data.languageCode,
+    //       name: Settings.currentVoiceName,
+    //     });
+    //
     const {success, charactercount} = await gTxt2Speech.apiFetchAudio(selectionText);
     if (!success) {
       await handleError();
