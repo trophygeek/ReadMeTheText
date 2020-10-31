@@ -7,7 +7,7 @@ import {VOICEMODEL} from "./voiceslist.js";
 class Toolbarpopup {
 
   _currentstate = PLAYBACKSTATE.IDLE;
-  
+
   /** @var {Element} **/
   _playbackbtn = null;
   /** @var {Element} **/
@@ -147,7 +147,6 @@ class Toolbarpopup {
     sandbox.select();
     if (document.execCommand('paste')) {
       result = sandbox.value;
-      trace('got value from sandbox: ', result);
     }
     sandbox.value = '';
     sandbox.hidden = true;
@@ -179,7 +178,7 @@ class Toolbarpopup {
       this._errmsgtext = $('#errmsgtext');
 
 
-      Settings.addChangedListener( this._checkIfEmptyKey.bind(this));
+      Settings.addChangedListener(this._checkIfEmptyKey.bind(this));
       this._checkIfEmptyKey();
 
       await this.refreshQuotaUi();
@@ -217,15 +216,37 @@ class Toolbarpopup {
         this._openOptionsPage();
       });
 
+      // button does a confirm step. It uses data-confirm to track it's stage.
+      let savedbuttontext = '';
       this._clipboardbtn.addEventListener('click', async (event) => {
         try {
           const granted = await asycChromeExt.chromePermssionsRequest(['clipboardRead']);
           if (granted) {
+            let confirmed = true;
             const clipboard = this._getClipboard();
-            if (clipboard.length > 32000) {  // todo: add setting to control this value.
-              // we need to confirm with a dialog.
+            if (clipboard.length > 5000) {  // todo: add setting to control this value.
+              const confirmeddata = this._clipboardbtn.getAttribute('data-confirm-stage') || '0';
+              if (confirmeddata === '0') {
+                // swap the button to be a confirm.
+                const confirmtxt = this._clipboardbtn.getAttribute('data-confirm-message');
+                savedbuttontext = this._clipboardbtn.innerHTML;
+                this._clipboardbtn.innerHTML = confirmtxt.replace('${size}',
+                    Intl.NumberFormat().format(clipboard.length));
+                this._clipboardbtn.classList.add('inverse');
+
+                this._clipboardbtn.setAttribute('data-confirm-stage', '1');
+                confirmed = false;
+              } else if (confirmeddata === '1') {
+                // so, it's a confirm click
+                this._clipboardbtn.innerHTML = savedbuttontext;
+                this._clipboardbtn.classList.remove('inverse');
+                savedbuttontext = '';
+              }
             }
-            chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: clipboard});
+            if (confirmed) {
+              chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: clipboard});
+              this._clipboardbtn.setAttribute('data-confirm-stage', '0');
+            }
           }
         } catch (err) {
           logerr(err, err.stack);

@@ -109,13 +109,15 @@
         <button id="clipboardbn" class="button bordered"
                 title="For pages that don't support right-click you can copy text into clipboard and use this"
                 aria-label="For pages that don't support right-click you can copy text into clipboard and use this"
-                tabindex="2" role="button">
+                tabindex="2" role="button"
+                data-confirm-stage="0"
+                data-confirm-message='Clipboard is ${size} characters. Play?'>
           <svg viewBox="0 0 24 24" class="icon-button" fill="black" aria-hidden="true" width="24px" height="24px">
             <use xlink:href="#playclipboard"></use>
           </svg>
           Play text in clipboard
         </button>
-
+        
         <button id="optionsbtn" class="button bordered"
                 title="Options"
                 aria-label="Options"
@@ -139,6 +141,8 @@
 
     </div>
 </div>
+
+
 <textarea id="sandbox" class="sandbox" tabindex="-1"></textarea>
 <script type="module" src="toolbarpopup.js"></script>
 </body>
