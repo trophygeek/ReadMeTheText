@@ -12,7 +12,7 @@
     "128": "icons/icon_128.png"
   },
   "browser_action": {
-    "default_title": "Read-anything",
+    "default_title": "ReadTextToMe",
     "default_popup": "src/toolbarpopup.html",
     "default_icon": {
       "16": "icons/icon_16.png",

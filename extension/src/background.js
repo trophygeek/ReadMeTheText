@@ -323,7 +323,7 @@ chrome.runtime.onSuspend.addListener(async function () {
   trace('chrome.runtime.onSuspend');
   await Settings.init();
   await setToolbarIcon((Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
-  chrome.browserAction.setBadgeText({text: "unload"});  // useful when debugging
+  // chrome.browserAction.setBadgeText({text: "unload"});  // useful when debugging
 });
 
 chrome.runtime.onSuspendCanceled.addListener(async function () {
