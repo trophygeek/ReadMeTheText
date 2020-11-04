@@ -71,6 +71,7 @@ class Toolbarpopup {
           break;
 
         case PLAYBACKSTATE.ERROR:
+          trace(`toolbar.updatePlaybackState PLAYBACKSTATE.ERROR `);
           const lasterr = StateBus.getLastError();
           if (lasterr !== '') {
             this._errmsg.classList.remove('hidden');

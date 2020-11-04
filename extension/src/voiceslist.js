@@ -69,7 +69,7 @@ export const VoicesList = {
    */
   async _googlevoice_voicelist_refetch() {
     try {
-      const data = await this.apiFetchVoices();
+      const data = await this.apiFetchVoices(Settings.apiKey);
       if (data === false) {
         return false;
       }

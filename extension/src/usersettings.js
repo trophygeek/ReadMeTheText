@@ -88,6 +88,7 @@ export const StateBus = {
     return StateBus._data.lasterr;
   },
   async setLastError(errstr) {
+    trace(`StateBus.setLastError('${errstr}')`);
     // humm... save? Maybe better to combine with currentState for efficiency.
     StateBus._data.lasterr = errstr;
     if (errstr !== '') {

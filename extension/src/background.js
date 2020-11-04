@@ -22,36 +22,52 @@ const unittests = async () => {
 let gTxt2Speech = null;
 let installed_menu = false;
 
-
 /**
  *
- * @param text {string}
+ * @param text_to_play {string}
  * @return {Promise<boolean>}
  */
-const playText = async (text = '') => {
+const playText = async (text_to_play = '') => {
   try {
     if (!gTxt2Speech) {
       // create a new playback object
-      gTxt2Speech = new classTextToSpeech(async () => {
+      const voicename = Settings.currentVoiceName;
+      gTxt2Speech = new classTextToSpeech(Settings.apiKey, async () => {
         // notified when the playback stops
         const new_state = gTxt2Speech.getPlaybackState();
         trace(`text_to_speech change state '${new_state}'`);
         await setToolbarIcon(new_state);
+      },async(count) => {
+        trace(`incr quotacountIncr by ${count} for voicename:'${voicename}'`);
+        await QuotaTracker.quotacountIncr(count, voicename);
       });
     }
+    gTxt2Speech.setVoice(
+      {
+        audioEncoding: Settings.data.audioEncoding,
+        effectsProfileId: Settings.data.effectsProfileId,
+        pitch: Settings.data.pitch,
+        speakingRate: Settings.data.speakingRate
+      },
+      {
+        languageCode: Settings.data.languageCode,
+        name: Settings.currentVoiceName,
+      }
+    );
 
-    const selectionText = gTxt2Speech.cleanupText(text) || '';
-    if (selectionText.trim() === '') {
+    const cleaned_text = gTxt2Speech.cleanupText(text_to_play) || '';
+    if (cleaned_text.trim() === '') {
       trace('trying to play empty text. what to do?');
       return false;
     }
 
     const handleError = async () => {
+      logerr('handleError function called');
       await StateBus.setLastError(gTxt2Speech.getLastError());
       setToolbarIcon(PLAYBACKSTATE.ERROR);
     };
 
-    const newCharCount = selectionText.length;
+    const newCharCount = cleaned_text.length;
 
     await QuotaTracker.init(); // make sure loaded in case we're unloaded
 
@@ -70,33 +86,13 @@ const playText = async (text = '') => {
     // if (quotaCharCount + newCharCount > ) { notify }
 
     await gTxt2Speech.stopTrack();  // no overlap
-
-    // const {success, charactercount} = await apiFetchAudio(text_to_speak,
-    //     apikey = Settings.apiKey,
-    //     audioConfig = {
-    //       audioEncoding: Settings.data.audioEncoding,
-    //       effectsProfileId: Settings.data.effectsProfileId,
-    //       pitch: Settings.data.pitch,
-    //       speakingRate: Settings.data.speakingRate
-    //     },
-    //     voice = {
-    //       languageCode: Settings.data.languageCode,
-    //       name: Settings.currentVoiceName,
-    //     });
-    //
-    const {success, charactercount} = await gTxt2Speech.apiFetchAudio(selectionText);
+    const success = await gTxt2Speech.playTextToSpeech(cleaned_text);
     if (!success) {
       await handleError();
       return false;
     }
+    setToolbarIcon(PLAYBACKSTATE.PLAYING);
 
-    const successplay = await gTxt2Speech.playTrack();
-    if (!successplay) {
-      await handleError();
-      return false;
-    }
-
-    await QuotaTracker.quotacountIncr(charactercount, Settings.currentVoiceName);
     return true;
   } catch (err) {
     logerr(err, err.stack);
@@ -160,10 +156,11 @@ const installMenu = async (details) => {
 
 const setToolbarIcon = async (newstate) => {
   try {
+    trace(`setToolbarIcon('${newstate}')`);
     switch (newstate) {
       case PLAYBACKSTATE.NOKEY:
         // todo
-          debugger;
+        debugger;
         break;
 
       case PLAYBACKSTATE.IDLE:
@@ -260,7 +257,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
               break;
 
             default:
-              await gTxt2Speech.playTrack();
+              const success = await gTxt2Speech.playTextToSpeech();
               break;
           }
         }
@@ -292,7 +289,7 @@ chrome.runtime.onInstalled.addListener(async function (details) {
     trace('chrome.runtime.onInstalled.addListener');
     await Settings.init();
     await installMenu();
-    await setToolbarIcon( (Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
+    await setToolbarIcon((Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
 
     chrome.tabs.create({
       url: `chrome-extension://${chrome.runtime.id}/src/setuphelp.html`
@@ -325,7 +322,7 @@ async function main() {
 chrome.runtime.onSuspend.addListener(async function () {
   trace('chrome.runtime.onSuspend');
   await Settings.init();
-  await setToolbarIcon( (Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
+  await setToolbarIcon((Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
   chrome.browserAction.setBadgeText({text: "unload"});  // useful when debugging
 });
 
