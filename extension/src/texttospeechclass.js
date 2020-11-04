@@ -341,11 +341,16 @@ export class classTextToSpeech {
         const settings_changed = await this._checksumAndCheckIfSettingsChanged();
         if (newtext || settings_changed) {
           this._splitTextIntoParts(textclean);
+          if (this._textParts.length === 0) {
+            logerr('parts after splitting is empty');
+            this.setPlaybackState(PLAYBACKSTATE.ERROR);
+            return false;
+          }
           // since we're gonna reload the auto buffers, clear the old ones.
           this._buffers_decoded = [];
         }
 
-        if (this._buffers_decoded.length === 0) {   // we need to fetch before playing.
+        if (this._buffers_decoded.length === 0 && this._textParts.length > 0) {   // we need to fetch before playing.
           this.setPlaybackState(PLAYBACKSTATE.DOWNLOADING);
           const success = await this._fetchAudioData(this._textParts.shift());
           if (!success) {

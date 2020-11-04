@@ -1,5 +1,5 @@
 :root {
-    --progress-back-color: #ddd;
+    --progress-back-color: #8f8f8f;
     --progress-fore-color: #ffab00;
     --button-back-color: var(--back-color);
     --button-hover-back-color: #f3f3f3;

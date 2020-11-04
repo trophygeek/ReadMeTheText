@@ -174,7 +174,7 @@ export const Settings = {
     pitch: 0.0,
     speakingRate: 1.0,
     languageCode: 'en-US',    // is just derived form voice_name?
-    testText: "Testing: 1,2,3",
+    testText: "Testing: 1, 2, 3",
     skipBackOnUnpause: 0.5,  // this is in seconds
 
     quota_size_warnings: true,
@@ -538,7 +538,7 @@ export const QuotaTracker = {
   /**
    *
    * @param increase {number}
-   * @param soundname {string}
+   * @param voicename {string}
    * @return {Promise<void>}
    */
   async quotacountIncr(increase = 0, voicename) {

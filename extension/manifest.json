@@ -1,7 +1,7 @@
 {
   "name": "ReadMeTheText Beta",
   "short_name": "ReadMeTheText",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "manifest_version": 2,
   "description": "Read text on a page using Google's high quality voices.",
   "homepage_url": "https://readmethetext.com/",
@@ -22,7 +22,7 @@
   },
   "options_page": "src/options.html",
   "permissions": ["contextMenus", "storage", "alarms"],
-  "optional_permissions": ["clipboardRead", "notifications"],
+  "optional_permissions": ["clipboardRead"],
   "background": {
     "page": "src/background.html",
     "persistent": false
