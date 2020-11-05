@@ -114,18 +114,39 @@ export class classTextToSpeech {
 
   /*
    * @param text {string}
+   * @return {string[]}
    * @private
    */
   _splitTextIntoParts(text) {
-    // if (textclean.length < this.MAX_TEXT_LEN_BEFORE_DOUBLE_BUFFER) {
-    //   this._textParts = [textclean];
-    //   return;
-    // }
+    const IDEAL_MESSAGE_SIZE = 400;
+    const TOO_SMALL_MESSAGE_SIZE = 24;
 
     const paragraphs = text.split('  ');  // test by sending each sentence
 
-    // todo: see if any paragraph is really big (epecially the first one), then split by sentences?
-    this._textParts = paragraphs;
+    // if there are any small paragraphs, merge them up.
+    if (paragraphs.length === 1) {
+      return [text];
+    }
+    
+    const results = [];
+    let nextmerge = paragraphs[0];
+    for (var ii=1; ii<paragraphs.length; ii++) {
+      const next = paragraphs[ii];
+      if (nextmerge.length + next.length < IDEAL_MESSAGE_SIZE
+          || next.length < TOO_SMALL_MESSAGE_SIZE) {
+        nextmerge = `${nextmerge}  ${next}`;
+      } else {
+        // would be too big, skip
+        results.push(nextmerge);
+        nextmerge = paragraphs[ii];
+      }
+    }
+
+    // handle remainder
+    if (nextmerge) {
+      results.push(nextmerge);
+    }
+    return results;
   }
 
   /**
@@ -216,7 +237,10 @@ export class classTextToSpeech {
         }
 
         // the playback will wait on this THIS promise.
-        this._nextFetchPromise = this._fetchAudioData(this._textParts.shift());   // do not await.
+        const nexttext = this._textParts.shift();
+        if (nexttext.trim() !== '') {
+          this._nextFetchPromise = this._fetchAudioData(nexttext);   // do not await.
+        }
       }
     } catch (err) {
       logerr(err, err.stack);
@@ -340,7 +364,7 @@ export class classTextToSpeech {
         // if settings changed, then we ignore caching.
         const settings_changed = await this._checksumAndCheckIfSettingsChanged();
         if (newtext || settings_changed) {
-          this._splitTextIntoParts(textclean);
+          this._textParts = this._splitTextIntoParts(textclean);
           if (this._textParts.length === 0) {
             logerr('parts after splitting is empty');
             this.setPlaybackState(PLAYBACKSTATE.ERROR);

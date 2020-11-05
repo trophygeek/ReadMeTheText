@@ -1,7 +1,7 @@
 {
   "name": "ReadMeTheText Beta",
   "short_name": "ReadMeTheText",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "manifest_version": 2,
   "description": "Read text on a page using Google's high quality voices.",
   "homepage_url": "https://readmethetext.com/",
@@ -21,11 +21,11 @@
     }
   },
   "options_page": "src/options.html",
-  "permissions": ["contextMenus", "storage", "alarms"],
+  "permissions": ["contextMenus", "storage"],
   "optional_permissions": ["clipboardRead"],
   "background": {
     "page": "src/background.html",
     "persistent": false
   },
-  "content_security_policy": "default-src 'self'; connect-src https://texttospeech.googleapis.com"
+  "content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://texttospeech.googleapis.com"
 }

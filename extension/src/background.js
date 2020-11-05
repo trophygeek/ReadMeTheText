@@ -217,9 +217,9 @@ const setToolbarIcon = async (newstate) => {
 
     // any status change resets memory freeing timer
     // clear timer and restart it to free resources
-    chrome.alarms.clear('FREE_MEM', () => {
-      chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
-    });
+    // chrome.alarms.clear('FREE_MEM', () => {
+    //   chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
+    // });
 
   } catch (err) {
     logerr(err, err.stack);
@@ -272,9 +272,9 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 
     // any status change resets memory freeing timer
     // clear timer and restart it to free resources
-    chrome.alarms.clear('FREE_MEM', () => {
-      chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
-    });
+    // chrome.alarms.clear('FREE_MEM', () => {
+    //   chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
+    // });
   } catch (err) {
     logerr(err, err.stack);
   }
@@ -300,18 +300,18 @@ chrome.runtime.onInstalled.addListener(async function (details) {
 });
 
 /** we're using this alarm to unload unused resources after N minutes of inactivity **/
-let rotationmod = 0;
-chrome.alarms.onAlarm.addListener(async function (alarm) {
-  trace('chrome.alarms.onAlarm');
-  await Settings.init();
-
-  switch (alarm.name) {
-    case 'FREE_MEM':
-      // chrome.browserAction.setBadgeText({text: "freed"});  // todo: remove - handy for dev
-      gTxt2Speech = null;
-      break;
-  }
-});
+// let rotationmod = 0;
+// chrome.alarms.onAlarm.addListener(async function (alarm) {
+//   trace('chrome.alarms.onAlarm');
+//   await Settings.init();
+//
+//   switch (alarm.name) {
+//     case 'FREE_MEM':
+//       // chrome.browserAction.setBadgeText({text: "freed"});  // todo: remove - handy for dev
+//       gTxt2Speech = null;
+//       break;
+//   }
+// });
 
 async function main() {
   await Settings.init();

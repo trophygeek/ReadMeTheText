@@ -318,7 +318,7 @@ export const Settings = {
    * @return {Promise<void>}
    * @static
    */
-  async addChangedListener(changefn) {
+  addChangedListener(changefn) {
     Settings._change_callbacks.push(changefn);
   },
 

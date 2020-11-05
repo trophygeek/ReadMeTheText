@@ -3,6 +3,7 @@
 import {$, CMD, logerr, trace, PLAYBACKSTATE, splitvoicename, asycChromeExt} from "./misc.js";
 import {Settings, StateBus, QuotaTracker} from "./usersettings.js";
 import {VOICEMODEL} from "./voiceslist.js";
+import {htmlToFormattedText} from "./convert_html_to_text.js";
 
 class Toolbarpopup {
 
@@ -146,16 +147,42 @@ class Toolbarpopup {
    * @private
    */
   _getClipboard() {
+    let captured_html = '';
+
+    // this will grab the html on the paste event.
+    const capture_html_fun = (e) => {
+      try {
+        captured_html = e.clipboardData.getData('text/html').trim();
+      } catch(err) {
+        logerr(err, err.stack);
+      }
+    };
+
+    const id = document.addEventListener('paste', capture_html_fun);
     let result = '';
     const sandbox = document.getElementById('sandbox');
     sandbox.value = '';
-    sandbox.hidden = false;
+    sandbox.hidden = false;   // unhide, while offscreen non-hidden elements can confuse aria
     sandbox.select();
     if (document.execCommand('paste')) {
       result = sandbox.value;
     }
+    // remove our listener no longer needed
+    document.removeEventListener('paste', capture_html_fun);
     sandbox.value = '';
     sandbox.hidden = true;
+
+    // this is not REALLY plain text. To get rid of all tags, this must still
+    // be "pasted" into a text field to remove all of them
+    if (captured_html !== '') {
+      result = htmlToFormattedText(captured_html, {
+        linkProcess: (href, linkText) => linkText,
+        imgProcess: (imSrc, imAlt) => `  Image with caption "${imAlt}"   `,   // TODO: LOCALIZE!!!!
+      });
+      // For speaking we want convert the linefeeds to spaces for spaking pauses.
+      result = result.replace(/\n/g, '.  ');
+    }
+
     return result;
   }
 
@@ -230,6 +257,7 @@ class Toolbarpopup {
           if (granted) {
             let confirmed = true;
             const clipboard = this._getClipboard();
+
             if (clipboard.length > 5000) {  // todo: add setting to control this value.
               const confirmeddata = this._clipboardbtn.getAttribute('data-confirm-stage') || '0';
               if (confirmeddata === '0') {

@@ -68,12 +68,10 @@ For full transparency here are all the permissions in this extension and how the
 ```json
 "permissions": [
   "contextMenus", 
-  "storage",
-  "alarms"
+  "storage"
 ],
   "optional_permissions": [
-  "clipboardRead",
-  "notifications",
+  "clipboardRead"
 ],
 ```
 
@@ -81,7 +79,6 @@ For full transparency here are all the permissions in this extension and how the
 |----------------|----------------------------|
 |`contextMenus`  | Can ONLY access selected text on a page when right-click menu item is selected.|
 |`   storage`    | Settings are saved and are synced across machines if Chrome is configured to do sync. Note: API key is NOT synced|
-|   `alarms`     | This is an alternative to setTimeout that is background.js unload large buffers to be more memory friendly|
 |`clipboardRead` | Used to text-to-speech the contents of the clipboard. Useful when page take over right-click menu|
-|`notifications` | Used if the person wants to be warned when approaching quota limits (todo)
+
 
