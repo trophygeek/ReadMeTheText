@@ -42,7 +42,6 @@ export class classTextToSpeech {
 
   /** Promise **/
   _nextFetchPromise = null;
-  _isPaused = false;
   _isStopped = false;
 
   _currentPlaybackstate = PLAYBACKSTATE.IDLE;
@@ -56,10 +55,8 @@ export class classTextToSpeech {
   _audioConfig = {};
   _voice = {};
 
-
   _prev_text_checksum = '';  // use to avoid refetching same data.
   _prev_settings_checksum = '';    // used to know if voice shouldn't be cached because settings changed
-
 
   /**
    * @param apikey {string}  Settings.apiKey
@@ -127,7 +124,7 @@ export class classTextToSpeech {
     if (paragraphs.length === 1) {
       return [text];
     }
-    
+
     const results = [];
     let nextmerge = paragraphs[0];
     for (var ii=1; ii<paragraphs.length; ii++) {

@@ -172,12 +172,17 @@ class Toolbarpopup {
     sandbox.value = '';
     sandbox.hidden = true;
 
-    // this is not REALLY plain text. To get rid of all tags, this must still
-    // be "pasted" into a text field to remove all of them
     if (captured_html !== '') {
+      // this will do some reformatting so we don't lose things like the numbers in front
+      // of <li> items. It will also make sure there are pauses around headers an add image captions
       result = htmlToFormattedText(captured_html, {
         linkProcess: (href, linkText) => linkText,
-        imgProcess: (imSrc, imAlt) => `  Image with caption "${imAlt}"   `,   // TODO: LOCALIZE!!!!
+        imgProcess: (imSrc, imAlt) => `  Image with caption "${imAlt}" .   `,   // TODO: LOCALIZE!!!!
+        headingStyle: 'breakline',
+        uIndentionChar: ' ',
+        oIndentionChar: ' ',
+        keepNbsps: false,
+        removeExtraWhitespace: false,
       });
       // For speaking we want convert the linefeeds to spaces for spaking pauses.
       result = result.replace(/\n/g, '.  ');

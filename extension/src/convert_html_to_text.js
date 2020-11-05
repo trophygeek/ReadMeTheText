@@ -1,7 +1,16 @@
 'use strict';
 
 // based on https://github.com/EDMdesigner/textversionjs/blob/master/src/textversion.js
+// Converted to ES6, Removed support for non-browser (e.g. node)
+// Added code to REALLY strip all html tags.
 
+/**
+ *
+ * @param ch {string}
+ * @param amount {Number}
+ * @return {string}
+ * @private
+ */
 const populateChar = (ch, amount) => {
   let result = "";
   for (let i = 0; i < amount; i += 1) {
@@ -10,23 +19,43 @@ const populateChar = (ch, amount) => {
   return result;
 };
 
+/**
+ * @param html {string}
+ * @return {string}
+ * @private
+ */
 const striphtml = (html) => {
   // NOTE: Calling this requires "style-src 'self' 'unsafe-inline';" be added to content_security_policy
-  // is it worth it?
   let doc = new DOMParser().parseFromString(html, 'text/html');
   return doc.body.textContent || "";
 }
 
+/**
+ *
+ * @param htmlText {string}
+ * @param styleConfig Object:{
+ *      linkProcess: {function({string},{string}):{string}},
+ *      imgProcess: {function({string},{string}):{string}},
+ *      headingStyle: {string},
+ *      uIndentionChar: {string},
+ *      listIndentionTabs: {number},
+ *      oIndentationChar: {string},
+ *      keepNbsps: {boolean},
+ *      removeExtraWhitespace: {boolean},
+ *      }
+ * @return {string}
+ */
 export function htmlToFormattedText(htmlText, styleConfig) {
   // define default styleConfig
   let linkProcess = null;
   let imgProcess = null;
-  let headingStyle = "breakline"; // hashify, breakline, underline
+  let headingStyle = "underline"; // hashify, breakline, underline
   let listStyle = "indention"; // indention, linebreak
-  let uIndentionChar = " ";
+  let uIndentionChar = "-";
   let listIndentionTabs = 3;
-  let oIndentionChar = " ";
-  let keepNbsps = true;
+  let oIndentionChar = "-";
+  let keepNbsps = false;
+  let removeExtraWhitespace = true;
 
   // or accept user defined config
   if (!!styleConfig) {
@@ -53,6 +82,9 @@ export function htmlToFormattedText(htmlText, styleConfig) {
     }
     if (!!styleConfig.keepNbsps) {
       keepNbsps = styleConfig.keepNbsps;
+    }
+    if (!!styleConfig.removeExtraWhitespace) {
+      removeExtraWhitespace = styleConfig.removeExtraWhitespace;
     }
   }
 
@@ -173,21 +205,23 @@ export function htmlToFormattedText(htmlText, styleConfig) {
     tmp = tmp.replace(/( |&nbsp;|\t)+/gi, " ");
   }
 
-  // // remove line starter spaces
-  // tmp = tmp.replace(/\n +/gi, "\n");
-  //
-  // // remove content starter spaces
-  // tmp = tmp.replace(/^ +/gi, "");
-  //
-  // // remove first empty line
-  // while (tmp.indexOf("\n") === 0) {
-  //   tmp = tmp.substring(1);
-  // }
-  //
-  // // put a new line at the end
-  // if (tmp.length === 0 || tmp.lastIndexOf("\n") !== tmp.length - 1) {
-  //   tmp += "\n";
-  // }
+  // remove line starter spaces
+  if (removeExtraWhitespace) {
+    tmp = tmp.replace(/\n +/gi, "\n");
+
+    // remove content starter spaces
+    tmp = tmp.replace(/^ +/gi, "");
+
+    // remove first empty line
+    while (tmp.indexOf("\n") === 0) {
+      tmp = tmp.substring(1);
+    }
+  }
+
+  // put a new line at the end
+  if (tmp.length === 0 || tmp.lastIndexOf("\n") !== tmp.length - 1) {
+    tmp += "\n";
+  }
 
   // we may have missed some tags, strip them
   tmp = striphtml(tmp);
