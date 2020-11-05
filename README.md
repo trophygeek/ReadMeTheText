@@ -73,6 +73,7 @@ For full transparency here are all the permissions in this extension and how the
   "optional_permissions": [
   "clipboardRead"
 ],
+"content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://texttospeech.googleapis.com"
 ```
 
 |   Permission   | Usage                      |
@@ -80,5 +81,9 @@ For full transparency here are all the permissions in this extension and how the
 |`contextMenus`  | Can ONLY access selected text on a page when right-click menu item is selected.|
 |`   storage`    | Settings are saved and are synced across machines if Chrome is configured to do sync. Note: API key is NOT synced|
 |`clipboardRead` | Used to text-to-speech the contents of the clipboard. Useful when page take over right-click menu|
+|`content_security_policy`|   `style-src 'self' 'unsafe-inline'` Used to safely strip html when converting html -> text from clipboard |
+|`content_security_policy`|   `connect-src https://texttospeech.googleapis.com"` API call to google apis |
+
+
 
 
