@@ -18,7 +18,9 @@ then the text can be copied into the clipboard and the "Play text in clipboard" 
 Google has a quota when converting text to speech. It allows for 1 million characters per month
 in the Free Tier, then charges a hefty $16 for the next 1 million characters.
 
-Unfortunately, there's no API to check your usage quota (yet). So, the extension attempts to keep track of it for you.
+Unfortunately, there's no API to check your usage quota (yet). So, the extension attempts to keep track of it for you. It uses chrome's built-in sync to coordinate useage across your machines, _if_ they are all logged into the same gmail account in chrome.
+
+There is a "Advanced play from clipboard" feature that works better than the default, text-only chrome context menu. This feature uses HTML to add things like numbers to ordered lists. 
 
 ### Motivations
 I make a lot of typos when I compose emails and I never seem to notice them until _after_ I've sent them. 
@@ -49,11 +51,13 @@ You can install it from here [url]
 
 `packages.json` is only used to get the latest .ts (typescript) declaration files. These are used by modern IDEs to add basic type checking.
 
-`/extension/` is the extensios
+`/extension/` is the extensions
 
 ## Extension's Manifest Permissions
 
-Extensions that need every possible permission are a security nightmare.This extension tries to increase privacy.
+Extensions that need every possible permission are a security nightmare. This extension tries to declare the least permissions required to work.  Non-core features like reading html from the clipboard are listed as optional and the user will get prompted before they are used.
+
+For full transparency, this section documents all the permissions in this extension and how they are used.
 
 Obviously, the extension must have access to text to pass it to google for converting to speech. 
 However, it does not have permission to all content on a page, just what you've selected.
@@ -61,9 +65,8 @@ However, it does not have permission to all content on a page, just what you've 
 It makes no other network calls other than to convert the text to speech api call. While settings are synced across machines,
 that is handle by Chrome's syncing mechanism and the API Key is NOT stored anywhere but locally.
 
-Reading the clipboard is disbabled by default and will prompt for permission when you go to use it.
+`clipboardRead` is disbabled by default (aka optional) and will prompt for permission when first used.
 
-For full transparency here are all the permissions in this extension and how they are used.
 
 ```json
 "permissions": [
