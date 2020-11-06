@@ -43,7 +43,7 @@ Text-to-speech Speak-it demo
 
 ### Finding in the Chrome Store
 
-You can install it from here [url]
+You can install a Beta from the [Chrome Store](https://chrome.google.com/webstore/detail/readmethetext-beta/ohefbjijnlclhjfclaijbhnjaejeeeog)
 
 
 
