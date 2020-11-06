@@ -3,7 +3,7 @@ ReadMeTheText Extension uses Google's Beta text-to-speech API to read text from 
 
 It installs a right-click options to read selected text, or you can use the extension's toolbar menu to read text in your clipboard. This is handy when the page has taken over the right-click context menu.
 
->  ![Demo of selected text feature ](./assets/example-playing-selected-text.png)
+>  <img src="./assets/example-playing-selected-text.png" width="800px">
  
  Right-click context menu will read selected text on most pages
 
