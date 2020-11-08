@@ -7,12 +7,8 @@ import {
   generateUniqueId,
   sha1,
   splitvoicename,
-  capitalize
 } from './misc.js';
-import {VOICESOUNDFORMAT, VOICEPROFILE, VOICEMODEL} from './voiceslist.js';
-
-// static class (singleton)
-// todo: break out quota data into it's own "class"
+import {VOICESOUNDFORMAT, VOICEPROFILE, VOICEMODEL} from './voiceslistconst.js';
 
 // <editor-fold defaultstate="collapsed" desc="-- DEFAULT_REQUEST_DATA  --">
 
@@ -33,7 +29,7 @@ export const CHAR_COUNT_STD_FREE_MAX = 4000000;
 };
 
  export const DEFAULT_REQUEST_DATA = {
-  apiKey: '',   // todo: must be filled in.
+  apiKey: '',
   audioConfig,
   voice,
 };
@@ -87,6 +83,7 @@ export const StateBus = {
   getLastError() {
     return StateBus._data.lasterr;
   },
+
   async setLastError(errstr) {
     trace(`StateBus.setLastError('${errstr}')`);
     // humm... save? Maybe better to combine with currentState for efficiency.
@@ -98,7 +95,7 @@ export const StateBus = {
 
   clearLastError() {
     StateBus._data.lasterr = '';
-    asycChromeExt.setLocalStorageData(StateBus.KEY, StateBus._data);
+    asycChromeExt.setLocalStorageData(StateBus.KEY, StateBus._data);  // fire and forget
   },
 
   /**
@@ -106,16 +103,14 @@ export const StateBus = {
    * @property
    * @param callbackonchange_fn {function}
    */
-  set onchange(callbackonchange_fn) {
+  setOnChange(callbackonchange_fn) {
     StateBus._change_callback_fn = callbackonchange_fn;
   },
 
   /**
-   * @param callbackonchange_fn {function}
    */
-  async init(callbackonchange_fn) {
+  async init() {
     StateBus._data = await asycChromeExt.getLocalStorageData(StateBus.KEY, StateBus._data);
-    StateBus.onchange = callbackonchange_fn;
 
     chrome.storage.onChanged.addListener(function (changes, namespace) {
       trace('StateBus.onchange changes ', changes);
@@ -315,7 +310,6 @@ export const Settings = {
    * Simplified callback. Add a function to be notified of the change.
    * Since Settings is a singleton, it doesn't pass data to the callback. Just access Singleton.
    * @param changefn {VoidFunction}
-   * @return {Promise<void>}
    * @static
    */
   addChangedListener(changefn) {
@@ -343,6 +337,14 @@ export const Settings = {
    */
   get apiKey() {
     return Settings._data_local_only._apikey;
+  },
+
+  /**
+   * @return {string}
+   * @static
+   */
+  get hasApiKey() {
+    return (Settings._data_local_only._apikey && Settings._data_local_only._apikey.length > 32);
   },
   /**
    * @param value {string}
@@ -392,8 +394,6 @@ const EMPTY_QUOTA = {
  *      a guid and saves it to localstorage.
  */
 export const QuotaTracker = {
-
-
   _quotadata: EMPTY_QUOTA,
 
   // NONE of these are saved
@@ -570,21 +570,22 @@ export const QuotaTracker = {
       // we need to loop over all the machines and collect data on them, to do this we're going batch the settings
       // query up.
       const sha1 = QuotaTracker._current_sha1;
-      const keysmap = {};
-      Settings.data.quota_all_unique_ids.map((id) => keysmap[`quota_${sha1}_${id}`] = EMPTY_QUOTA);
+      const keyprefix = `quota_${sha1}_`;
 
-      const alldata = await asycChromeExt.getRemoteStorageDataBulk(keysmap);
+      const alldata = await asycChromeExt.getRemoteStorageDataBulk(null);
       let char_count_std_total = 0;
       let char_count_wave_total = 0;
 
       const quota_last_reset_date = new Date(Settings.data.quota_last_reset_date_str);
       for (const [key, value] of Object.entries(alldata)) {
-        // check the last reset? e.g. a machine never
-        const isnewer = new Date(value.last_save) > quota_last_reset_date;
-        if (isnewer) {
-          // we can use this it's not too old
-          char_count_std_total += value.char_count_std || 0;
-          char_count_wave_total += value.char_count_wave || 0;
+        if (key.startsWith(keyprefix)) {
+          // check the last reset? e.g. a machine never
+          const isnewer = new Date(value.last_save) > quota_last_reset_date;
+          if (isnewer) {
+            // we can use this it's not too old
+            char_count_std_total += value.char_count_std || 0;
+            char_count_wave_total += value.char_count_wave || 0;
+          }
         }
       }
 

@@ -1,28 +1,8 @@
 'use strict';
 import {asycChromeExt, jsonParseSafe, logerr} from "./misc.js";
 import {DEFAULT_VOICES_DATA} from "./data_static.js";
-
-export const VOICEMODEL = {
-  WAVENET: 'Wavenet',
-  STANDARD: 'Standard',
-};
-
-export const VOICESOUNDFORMAT = {
-  MP3: 'MP3_32_KBPS',
-  MP3_64: 'MP3_64_KBPS',
-  LINEAR16: 'LINEAR16',
-};
-
-export const VOICEPROFILE = {
-  WEARABLE: 'wearable-class-device',
-  HANDSET: 'handset-class-device',
-  HEADPHONE: 'headphone-class-device',
-  SMALL_SPEAKERS: 'small-bluetooth-speaker-class-device',
-  MEDIUM_SPEAKERS: 'medium-bluetooth-speaker-class-device',
-  LARGE_SPEAKERS: 'large-home-entertainment-class-device',
-  AUTO: 'large-automotive-class-device',
-  IVR: 'telephony-class-application',
-};
+import {Settings} from "./usersettings.js";
+import {TextToSpeech} from "./texttospeechclass.js";
 
 // export const VOICEGENDER = {
 //   // NO idea why these are UPPERCASED like this.
@@ -37,45 +17,53 @@ export const VoicesList = {
 
   // * Probably want to use googlevoice_voicelist_map.
   async load(reload = false) {
-    /**
-     * This will attempt the following in this order:
-     *   1. Load cached voice data from localStorage
-     *   2. Use Default data cached hardcoded in extension (probably out of dat)
-     * @return {Promise<{}>}
-     * @private
-     */
+    try {
+      /**
+       * This will attempt the following in this order:
+       *   1. Load cached voice data from localStorage
+       *   2. Use Default data cached hardcoded in extension (probably out of dat)
+       * @return {Promise<{}>}
+       * @private
+       */
+      debugger;
+      if (!reload && VoicesList._cached_voicelist !== null) {
+        return;
+      }
 
-    if (!reload && VoicesList._cached_voicelist !== null) {
-      return VoicesList._cached_voicelist;
-    }
+      if (reload) {
+        // loads into SETTINGS._cached_voicelist
+        VoicesList._cached_voicelist = await VoicesList._googlevoice_voicelist_fetch(true);
+      }
 
-    if (reload) {
-      // loads into SETTINGS._cached_voicelist
-      await VoicesList._googlevoice_voicelist_refetch();
+      if (VoicesList._cached_voicelist === null) {   // will be empty if _googlevoice_voicelist_fetch failed too.
+        // fall back to static data.
+        VoicesList._cached_voicelist = await asycChromeExt.getLocalStorageData('VOICES_LIST_DATA', DEFAULT_VOICES_DATA.voices);
+      }
+    } catch(err) {
+      logerr(err, err.stack);
     }
-
-    if (VoicesList._cached_voicelist === null) {   // will be empty if _googlevoice_voicelist_refetch failed too.
-      // fall back to static data.
-      VoicesList._cached_voicelist = await asycChromeExt.getLocalStorageData('VOICES_LIST_DATA', DEFAULT_VOICES_DATA);
-    }
-    return VoicesList._cached_voicelist;
   },
 
 
   /**
    * Will fetch latest voice data from Google using voice api key and save it to localstorage.
-   * @return {Promise<boolean>}
+   * @param reload
+   * @return {Promise<{voice_name: string, lang?: string, gender?: string, event_types?: string[]}[]|null>}
    * @private
    */
-  async _googlevoice_voicelist_refetch() {
+  async _googlevoice_voicelist_fetch(reload = false) {
     try {
-      const data = await this.apiFetchVoices(Settings.apiKey);
-      if (data === false) {
-        return false;
+      await Settings.init();
+      if (!Settings.hasApiKey) {
+        return null;
+      }
+      const data = await TextToSpeech.apiFetchVoices(Settings.apiKey, reload);
+      if (!data) {
+        return null;
       }
 
       const data_json = jsonParseSafe(data);
-      VoicesList._cached_voicelist = data_json.voices.sort((a, b) => {
+      const result = data_json.voices.sort((a, b) => {
         /** data looks like this in beta
         {
         "languageCodes": ["de-DE"],
@@ -91,10 +79,10 @@ export const VoicesList = {
         }
       });
       await asycChromeExt.setLocalStorageData('VOICES_LIST_DATA', VoicesList._cached_voicelist);
-      return true;
+      return result;
     } catch (err) {
       logerr(err, err.stack);
-      return false;
+      return null;
     }
   },
 

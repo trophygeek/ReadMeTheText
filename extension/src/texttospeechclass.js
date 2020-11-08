@@ -27,7 +27,7 @@ import {jsonParseSafe, logerr, PLAYBACKSTATE, sha1, trace} from "./misc.js";
  *    The playback needs to block until it's ready, then continue on it's normal way.
  *
  */
-export class classTextToSpeech {
+export class TextToSpeech {
   /** @var {AudioContext} **/
   _audioCtx = null;
   /** @var {AudioBufferSourceNode} **/
@@ -115,7 +115,7 @@ export class classTextToSpeech {
    * @private
    */
   _splitTextIntoParts(text) {
-    const IDEAL_MESSAGE_SIZE = 400;
+    const IDEAL_MESSAGE_SIZES = [20, 50, 200, 400];   // start small to play something fast.
     const TOO_SMALL_MESSAGE_SIZE = 24;
 
     const paragraphs = text.split('  ');  // test by sending each sentence
@@ -124,12 +124,24 @@ export class classTextToSpeech {
     if (paragraphs.length === 1) {
       return [text];
     }
-
+    trace(`   "${text}"`);
     const results = [];
     let nextmerge = paragraphs[0];
-    for (var ii=1; ii<paragraphs.length; ii++) {
+    {
+      // The very first request needs to be small so the audio starts playing sooner.
+      const end_of_first_sentence = nextmerge.indexOf('. ');
+      if (end_of_first_sentence > IDEAL_MESSAGE_SIZES[0]) {
+        const trimmed = nextmerge.trim();
+        const firstsentence = trimmed.slice(0, end_of_first_sentence + 1);
+        const remaining = trimmed.slice(end_of_first_sentence + 2);
+        results.push(firstsentence);
+        nextmerge = remaining;
+      }
+    }
+    for (var ii = 1; ii < paragraphs.length; ii++) {
       const next = paragraphs[ii];
-      if (nextmerge.length + next.length < IDEAL_MESSAGE_SIZE
+      const ideal_msg_size = IDEAL_MESSAGE_SIZES[ii] || IDEAL_MESSAGE_SIZES[IDEAL_MESSAGE_SIZES.length - 1];
+      if (nextmerge.length + next.length < ideal_msg_size
           || next.length < TOO_SMALL_MESSAGE_SIZE) {
         nextmerge = `${nextmerge}  ${next}`;
       } else {
@@ -143,6 +155,7 @@ export class classTextToSpeech {
     if (nextmerge) {
       results.push(nextmerge);
     }
+    results.forEach((str, ii) => trace(`${ii}. "${str}"`));
     return results;
   }
 
@@ -402,9 +415,9 @@ export class classTextToSpeech {
   async _playTracksChained(unpause = false) {
     try {
       // are we done?
-      if ( (this._textParts.length===0)
+      if ((this._textParts.length === 0)
           && (this._buffer_ii >= this._buffers_decoded)
-      && !this._nextFetchPromise) {
+          && !this._nextFetchPromise) {
         trace(`_playTracksChained not playing seems like we're done`);
         return;
       }
@@ -546,32 +559,37 @@ export class classTextToSpeech {
     ...
    */
   /**
+   * uses aggressive caching if not reload.
    * @param apikey {string}
-   * @return {Promise<string|boolean>}
+   * @param reload {boolean}
+   * @return {Promise<string>}
    * @static
    */
-  async apiFetchVoices(apikey = '') {
+  static async apiFetchVoices(apikey = '', reload=false) {
     try {
-      if (apikey !== '') {
+      if (apikey === '') {
         logerr('API key not set');
-        return false;
+        return '';
       }
       const url = `https://texttospeech.googleapis.com/v1beta1/voices?key=${apikey}`;
       const response = await fetch(url, {
         referrer: `https://${chrome.runtime.id}`,
+        cache: reload? "reload" : "force-cache"
       }).catch((err) => {
         throw Error(err.message);
       });
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.ok) {
+        return await response.text();
       }
 
-      return await response.text();
+      logerr('fetching voices faile', response.statusText);
+      return '';
     } catch (err) {
       logerr(err, err.stack);
       // this._setLastError(err.toString());
-      return false;
+      return '';
     }
   }
+
 }
 

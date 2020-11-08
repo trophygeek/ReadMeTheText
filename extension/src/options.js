@@ -18,7 +18,8 @@ import {
   splitvoicename,
   getVoicenameList,
 } from "./misc.js";
-import {VOICEMODEL, VoicesList} from "./voiceslist.js";
+import {VOICEMODEL} from "./voiceslistconst.js";
+import {VoicesList} from "./voiceslist.js";
 
 try {
   //  <optgroup label="Sports"> could be used
@@ -81,7 +82,7 @@ try {
    */
   const refreshMenusBasedOnVoice = async (current_voice = DEFAULT_VOICE_NAME) => {
     try {
-      const {lang, languageCode, voiceModel, variant} = splitvoicename(current_voice);
+      const {lang, voiceModel} = splitvoicename(current_voice);
       const voicenames = await getVoicenameList([lang]);
 
       // voicemodel menu
@@ -154,13 +155,13 @@ try {
   }
 
   // OnLoad
-  document.addEventListener('DOMContentLoaded', async () => {
+  const loadPage = async () => {
     try {
       await Settings.init();
       await QuotaTracker.init();
       await VoicesList.load();
 
-      const {voiceModel, variant, languageCode, lang} = splitvoicename(Settings.currentVoiceName);
+      const {languageCode} = splitvoicename(Settings.currentVoiceName);
       const current_lang = languageCode;
 
       {  // apikey
@@ -169,11 +170,11 @@ try {
         updateKeyRequiredMsg();
 
         // change event
-        apikeyelem.addEventListener('change', async (evt) => {
+        apikeyelem.addEventListener('change', async () => {
           Settings.apiKey = apikeyelem.value.trim();
           updateKeyRequiredMsg();
           await Settings.save();    // do not debouce, always save asap.
-          $('#playtestsound').disabled = (Settings.apiKey.length < 32);
+          $('#playtestsound').disabled = (!Settings.hasApiKey);
         });
 
         apikeyelem.addEventListener('keyup', (evt) => {
@@ -197,7 +198,7 @@ try {
         // set initial value
         pitchelem.value = Settings.data.pitch;
 
-        pitchelem.addEventListener('change', async (evt) => {
+        pitchelem.addEventListener('change', async () => {
           // save
           Settings.data.pitch = parseFloat(pitchelem.value);
           debounceSave();
@@ -210,7 +211,7 @@ try {
         const speakingrateelm = $('#speakingRate');
         // set initial value
         speakingrateelm.value = Settings.data.speakingRate;
-        speakingrateelm.addEventListener('change', async (evt) => {
+        speakingrateelm.addEventListener('change', async () => {
           // save
           Settings.data.speakingRate = parseFloat(speakingrateelm.value);
           debounceSave();
@@ -245,7 +246,7 @@ try {
       const voicemodelselect = $('#voiceModel');
 //      const voicegenderselect = $('#voicegender');
       const voiceids = $('#voiceids');
-      const fullvoicelist = await getVoicenameList();
+      // const fullvoicelist = await getVoicenameList();
 
       { // language popup dropdown select
         const lang_map = languageStrings.getlangonlymap();  // [en:"English"]
@@ -268,7 +269,7 @@ try {
       // 2. We pick the first voice from that change
       // 3. We match up all the attribute menus to match that voice.
 
-      const updateMenusFn = async (target) => {
+      const updateMenusFn = async () => {
         try {
           const lang = $('#langselect').value;
           const voiceModel = $('#voiceModel').value;
@@ -306,15 +307,23 @@ try {
         testtextelem.addEventListener('change', (event) => {
           const newtext = event.currentTarget.value;
           Settings.data.testText = newtext.trim();
-          playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey.length < 32 );
+          playtestsound.disabled = (Settings.data.testText === '' || !Settings.hasApiKey );
           debounceSave();
         });
 
-        playtestsound.disabled = (Settings.data.testText === '' || Settings.apiKey.length < 32);
+        playtestsound.disabled = (Settings.data.testText === '' || !Settings.hasApiKey);
         playtestsound.addEventListener('click', () => {
           queueMicrotask( () => {
             chrome.runtime.sendMessage({cmd: CMD.PLAYTESTSOUND, data: testtextelem.value});
           });
+        });
+      }
+
+      { // refreshvoices button
+        const refreshvoices = $('#refreshvoices');
+        refreshvoices.addEventListener('click', async() => {
+          await VoicesList.load(true);
+          queueMicrotask( loadPage);    // call the page to reload again
         });
       }
 
@@ -327,7 +336,7 @@ try {
         const quota_count_std_elem = $('#quotaValueStd');
         const quota_count_wave_elem = $('#quotaValueWave');
         const quota_date_elem = $('#quotaLastReset');
-        const quota_reset_btn = $('#quotaResetBtn')
+        const quota_reset_btn = $('#quotaResetBtn');
 
         const updatefn = async () => {
           const totals = await QuotaTracker.get_quota_totals();
@@ -362,7 +371,7 @@ try {
         await QuotaTracker.addChangedListener(updatefn);  // watch for changes.
         await Settings.addChangedListener(updatefn);
 
-        quotaResetBtn.addEventListener('click', async () => {
+        quota_reset_btn.addEventListener('click', async () => {
           await QuotaTracker.quotatime_reset();
           await updatefn();
         });
@@ -371,8 +380,9 @@ try {
     } catch (err) {
       logerr(err, err.stack);
     }
+  }
 
-  });
+  document.addEventListener('DOMContentLoaded', loadPage);
 
 } catch (err) {
   logerr(err, err.stack)

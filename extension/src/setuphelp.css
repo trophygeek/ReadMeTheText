@@ -22,3 +22,8 @@ figure {
     max-width: 650px;
     padding-left: 23px;
 }
+
+h2.sectionheader {
+    background-color: #004f77 !important;
+    color: white !important;
+}

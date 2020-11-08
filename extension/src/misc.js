@@ -1,14 +1,14 @@
 'use strict';
 // shared by background, popup and options page. Should have not external dependencies
-import {VOICEMODEL, VoicesList} from "./voiceslist.js";
-import {Settings} from "./usersettings.js";
+import {VOICEMODEL} from "./voiceslistconst.js";
+import {VoicesList} from "./voiceslist.js";
 import {LANGUAGESTRINGSDATA} from "./data_static.js";
 
 const ERR_BREAK_ENABLED = true;
 const TRACE_ENABLED = true;
 
 // todo: abstract out keys so there can be multiple ones, each with their own quota tracking
-export const EXT_NAME = 'gTextToSpeechExt';  // todo: come up with actual name
+export const EXT_NAME = 'ReadMeTheTextExt';  // todo: come up with actual name
 
 /* eslint-disable: no-console no-undef no-octal-escape no-octal */
 export const logerr = (...args) => {
@@ -34,6 +34,7 @@ export const CMD = {
   PLAY: 'PLAY',
   PLAYTESTSOUND: 'PLAYTESTSOUND',
   SAVESOUND: 'SAVESOUND',
+  REFRESHVOICES: 'REFRESHVOICES',
 };
 
 export const PLAYBACKSTATE = {
@@ -378,7 +379,7 @@ export const asycChromeExt = {
 
   /**
    *
-   * @param keysmap [{String:{objec}}]
+   * @param keysmap [{String:{object}}]
    * @return {Promise<{}>}
    */
   getRemoteStorageDataBulk: (keysmap) => {
@@ -484,6 +485,7 @@ export function generateUniqueId() {
   const rnd = crypto.getRandomValues(new Uint8Array(8));
   return Array.prototype.map.call(rnd, x => (('00' + x.toString(16)).slice(-2))).join('');
 }
+
 
 // /**
 //  *

@@ -50,7 +50,6 @@
           It WILL NOT WORK without a key.
         </div>
         <div class="col-md-offset-1">
-          <!-- todo: generate this link in js dynamically -->
           <a href="chrome-extension://chrome.runtime.id/src/setuphelp.html" target="_blank">See how to get your own key from Google for free
             <svg viewBox="0 0 24 24" class="icon" fill="#0277bd" aria-hidden="true" tabindex="0">
               <use xlink:href="#launch-icon"></use>
@@ -171,6 +170,14 @@
       </div>
     </div>
 
+    <div class="row responsive-label">
+      <div class="col-sm-12 col-md-3">
+        <label for="speakingRate">Update voices list from Google API</label>
+      </div>
+      <div class="col-sm-12 col-md">
+        <button id="refreshvoices" role="button" type="button" aria-label="Refreshes list of voices from google's api">Refresh voices from server</button>
+      </div>
+    </div>
   </fieldset>
 </form>
 

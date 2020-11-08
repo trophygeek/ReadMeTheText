@@ -49,7 +49,7 @@ export function htmlToFormattedText(htmlText, styleConfig) {
   // define default styleConfig
   let linkProcess = null;
   let imgProcess = null;
-  let headingStyle = "underline"; // hashify, breakline, underline
+  let headingStyle = "underline"; // hashify, breakline, underline, uppercase
   let listStyle = "indention"; // indention, linebreak
   let uIndentionChar = "-";
   let listIndentionTabs = 3;
@@ -176,6 +176,10 @@ export function htmlToFormattedText(htmlText, styleConfig) {
   } else if (headingStyle === "hashify") {
     tmp = tmp.replace(/<h([1-6])[^>]*>([^<]*)<\/h\1>/gi, function (str, p1, p2) {
       return "\n&nbsp;\n" + populateChar("#", p1) + " " + p2 + "\n&nbsp;\n";
+    });
+  } else if (headingStyle === "uppercase") {
+    tmp = tmp.replace(/<h([1-6])[^>]*>([^<]*)<\/h\1>/gi, function (str, p1, p2) {
+      return "\n" + p2.toUpperCase() + "\n";
     });
   }
 

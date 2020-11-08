@@ -1,7 +1,7 @@
 'use strict';
 import {logerr, trace, PLAYBACKSTATE, CMD} from "./misc.js";
 import {StateBus, Settings, QuotaTracker} from "./usersettings.js";
-import {classTextToSpeech} from "./texttospeechclass.js";
+import {TextToSpeech} from "./texttospeechclass.js";
 
 // see https://cloud.google.com/text-to-speech/docs/reference/rest
 // https://developer.chrome.com/extensions/background_migration
@@ -18,7 +18,7 @@ const unittests = async () => {
   }
 }
 
-/** @var {classTextToSpeech} */
+/** @var {TextToSpeech} */
 let gTxt2Speech = null;
 let installed_menu = false;
 
@@ -28,11 +28,18 @@ let installed_menu = false;
  * @return {Promise<boolean>}
  */
 const playText = async (text_to_play = '') => {
+  const handleErrorFn = async () => {
+    logerr('handleError function called');
+    const lasterr = gTxt2Speech.getLastError();
+    await StateBus.setLastError(lasterr);
+    await setToolbarIcon(PLAYBACKSTATE.ERROR, lasterr);
+  };
+
   try {
     if (!gTxt2Speech) {
       // create a new playback object
       const voicename = Settings.currentVoiceName;
-      gTxt2Speech = new classTextToSpeech(Settings.apiKey, async () => {
+      gTxt2Speech = new TextToSpeech(Settings.apiKey, async () => {
         // notified when the playback stops
         const new_state = gTxt2Speech.getPlaybackState();
         trace(`text_to_speech change state '${new_state}'`);
@@ -61,12 +68,6 @@ const playText = async (text_to_play = '') => {
       return false;
     }
 
-    const handleError = async () => {
-      logerr('handleError function called');
-      await StateBus.setLastError(gTxt2Speech.getLastError());
-      setToolbarIcon(PLAYBACKSTATE.ERROR);
-    };
-
     const newCharCount = cleaned_text.length;
 
     await QuotaTracker.init(); // make sure loaded in case we're unloaded
@@ -88,15 +89,15 @@ const playText = async (text_to_play = '') => {
     await gTxt2Speech.stopTrack();  // no overlap
     const success = await gTxt2Speech.playTextToSpeech(cleaned_text);
     if (!success) {
-      await handleError();
+      await handleErrorFn();
       return false;
     }
-    setToolbarIcon(PLAYBACKSTATE.PLAYING);
+    await setToolbarIcon(PLAYBACKSTATE.PLAYING);
 
     return true;
   } catch (err) {
     logerr(err, err.stack);
-    await handleError();
+    await handleErrorFn();
   }
   return false;
 };
@@ -105,7 +106,7 @@ const fetchAndPlaySound = async (text) => {
   try {
     await Settings.init();
 
-    if (Settings.apiKey === '') {
+    if (!Settings.hasApiKey) {
       chrome.browserAction.setBadgeText({text: "!"});
       // we need to notify that they key is not set in the toolbar.
       return;
@@ -115,6 +116,14 @@ const fetchAndPlaySound = async (text) => {
     const success = await playText(text);
 
   } catch (err) {
+    logerr(err, err.stack);
+  }
+};
+
+const fetchVoiceList = async() => {
+  try {
+
+  } catch(err) {
     logerr(err, err.stack);
   }
 };
@@ -137,7 +146,7 @@ const installMenu = async (details) => {
     trace('chrome.contextMenus.create ');
     chrome.contextMenus.create({
       "id": `text_to_speech_extension`,
-      "title": `Speak "%s"`,
+      "title": `Speak "%s"`,      // todo: localize
       "contexts": ["selection"],
     });
 
@@ -151,18 +160,19 @@ const installMenu = async (details) => {
   } catch (err) {
     logerr(err, err.stack);
   }
-
 };
 
-const setToolbarIcon = async (newstate) => {
+/**
+ *
+ * @param newstate {string}
+ * @param message {string}
+ * @return {Promise<void>}
+ */
+const setToolbarIcon = async (newstate, message= "") => {
   try {
     trace(`setToolbarIcon('${newstate}')`);
     switch (newstate) {
       case PLAYBACKSTATE.NOKEY:
-        // todo
-        debugger;
-        break;
-
       case PLAYBACKSTATE.IDLE:
       case PLAYBACKSTATE.STOPPED:
         chrome.browserAction.setIcon({
@@ -172,6 +182,7 @@ const setToolbarIcon = async (newstate) => {
             '32': "/icons/icon_32.png"
           },
         });
+
         if (Settings.apiKey !== '') {
           chrome.browserAction.setBadgeText({text: ""});  // clear
         } else {
@@ -213,13 +224,11 @@ const setToolbarIcon = async (newstate) => {
         chrome.browserAction.setBadgeText({text: "⚠"});
         break;
     }
-    await StateBus.setCurrentState(newstate);   // this broadcasts the new state to other modules if it's different.
 
-    // any status change resets memory freeing timer
-    // clear timer and restart it to free resources
-    // chrome.alarms.clear('FREE_MEM', () => {
-    //   chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
-    // });
+    chrome.browserAction.setTitle({title: (message || "Select text on page and right click")});  // todo: localize
+
+
+    await StateBus.setCurrentState(newstate);   // this broadcasts the new state to other modules if it's different.
 
   } catch (err) {
     logerr(err, err.stack);
@@ -268,13 +277,12 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         trace(`CMD.PLAYTESTSOUND: '${request.data}'`);
         await fetchAndPlaySound(request.data);
         break;
+
+      case CMD.REFRESHVOICES:
+        await fetchVoiceList(request.data);
+        break;
     }
 
-    // any status change resets memory freeing timer
-    // clear timer and restart it to free resources
-    // chrome.alarms.clear('FREE_MEM', () => {
-    //   chrome.alarms.create('FREE_MEM', {delayInMinutes: 10.0});
-    // });
   } catch (err) {
     logerr(err, err.stack);
   }
@@ -299,30 +307,25 @@ chrome.runtime.onInstalled.addListener(async function (details) {
   }
 });
 
-/** we're using this alarm to unload unused resources after N minutes of inactivity **/
-// let rotationmod = 0;
-// chrome.alarms.onAlarm.addListener(async function (alarm) {
-//   trace('chrome.alarms.onAlarm');
-//   await Settings.init();
-//
-//   switch (alarm.name) {
-//     case 'FREE_MEM':
-//       // chrome.browserAction.setBadgeText({text: "freed"});  // todo: remove - handy for dev
-//       gTxt2Speech = null;
-//       break;
-//   }
-// });
-
 async function main() {
   await Settings.init();
+  Settings.addChangedListener(async() => {
+    if (StateBus.currentState === PLAYBACKSTATE.NOKEY) {
+      if (Settings.hasApiKey) {
+        await setToolbarIcon(PLAYBACKSTATE.IDLE);
+      }
+    }
+  });
   await StateBus.init();
   await installMenu();
+
+  await setToolbarIcon(PLAYBACKSTATE.IDLE);
 }
 
 chrome.runtime.onSuspend.addListener(async function () {
   trace('chrome.runtime.onSuspend');
   await Settings.init();
-  await setToolbarIcon((Settings.apiKey === '') ? PLAYBACKSTATE.NOKEY : PLAYBACKSTATE.IDLE);
+  await setToolbarIcon(PLAYBACKSTATE.IDLE);
   // chrome.browserAction.setBadgeText({text: "unload"});  // useful when debugging
 });
 
@@ -332,7 +335,6 @@ chrome.runtime.onSuspendCanceled.addListener(async function () {
 });
 
 chrome.runtime.onStartup.addListener(async function () {
-  trace('chrome.runtime.onStartup');
   await main();
 });
 

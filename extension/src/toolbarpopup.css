@@ -110,6 +110,9 @@ label {
     text-align: center;
 }
 
+.my-btn-icon:disabled > svg {
+    fill: #555555;
+}
 
 .animationbase {
     overflow: hidden;

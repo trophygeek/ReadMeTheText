@@ -2,7 +2,7 @@
 
 import {$, CMD, logerr, trace, PLAYBACKSTATE, splitvoicename, asycChromeExt} from "./misc.js";
 import {Settings, StateBus, QuotaTracker} from "./usersettings.js";
-import {VOICEMODEL} from "./voiceslist.js";
+import {VOICEMODEL} from "./voiceslistconst.js";
 import {htmlToFormattedText} from "./convert_html_to_text.js";
 
 class Toolbarpopup {
@@ -63,6 +63,7 @@ class Toolbarpopup {
       // show/hide alert mesages
       switch (playbackstate) {
         case PLAYBACKSTATE.PLAYING:
+        case PLAYBACKSTATE.DOWNLOADING:
           this._playbackbtn.classList.add('animationbase', 'animationbk');
           break;
 
@@ -84,7 +85,7 @@ class Toolbarpopup {
         default:
           // hide all the message
           this._errmsg.classList.add('hidden');
-          if (Settings.apiKey.length > 32) {
+          if (Settings.hasApiKey) {
             this._keyrequiredmsg.classList.add('hidden');
           }
           break;
@@ -158,7 +159,7 @@ class Toolbarpopup {
       }
     };
 
-    const id = document.addEventListener('paste', capture_html_fun);
+    document.addEventListener('paste', capture_html_fun);
     let result = '';
     const sandbox = document.getElementById('sandbox');
     sandbox.value = '';
@@ -177,22 +178,24 @@ class Toolbarpopup {
       // of <li> items. It will also make sure there are pauses around headers an add image captions
       result = htmlToFormattedText(captured_html, {
         linkProcess: (href, linkText) => linkText,
-        imgProcess: (imSrc, imAlt) => `  Image with caption "${imAlt}" .   `,   // TODO: LOCALIZE!!!!
+        imgProcess: (imSrc, imAlt) => `  Image with caption "${imAlt}" .   `,   // todo: localize
         headingStyle: 'breakline',
         uIndentionChar: ' ',
         oIndentionChar: ' ',
         keepNbsps: false,
         removeExtraWhitespace: false,
       });
-      // For speaking we want convert the linefeeds to spaces for spaking pauses.
-      result = result.replace(/\n/g, '.  ');
+
+      // For speaking we want convert the linefeeds to spaces for spaking pauses.\w\n works, but we want more pauses
+      // after :
+      result = result.replace(/([^.!?])\n/g, "$1. \n");
     }
 
     return result;
   }
 
   _checkIfEmptyKey() {
-    if (Settings.apiKey.length < 32) {
+    if (!Settings.hasApiKey) {
       this._keyrequiredmsg.classList.remove('hidden');
     } else {
       this._keyrequiredmsg.classList.add('hidden');
@@ -202,7 +205,8 @@ class Toolbarpopup {
   async onload() {
     try {
       await Settings.init();
-      await StateBus.init(this.updatePlaybackState.bind(this));
+      await StateBus.init();
+      StateBus.setOnChange(this.updatePlaybackState.bind(this));
       await QuotaTracker.init();
 
       this._playbackbtn = $('#playbackbtn');
@@ -229,7 +233,7 @@ class Toolbarpopup {
       await this.updatePlaybackState(); // set our initial UI state
 
       // clicking the play button
-      this._playbackbtn.addEventListener('click', (event) => {
+      this._playbackbtn.addEventListener('click', () => {
         switch (this._currentstate) {
           case PLAYBACKSTATE.PLAYING:
             chrome.runtime.sendMessage({cmd: CMD.PAUSE});
@@ -242,28 +246,28 @@ class Toolbarpopup {
         }
       });
 
-      this._stopbtn.addEventListener('click', (event) => {
+      this._stopbtn.addEventListener('click', () => {
         chrome.runtime.sendMessage({cmd: CMD.STOP});
       });
 
-      this._optionsbtn.addEventListener('click', (event) => {
+      this._optionsbtn.addEventListener('click', () => {
         this._openOptionsPage();
       });
 
-      this._optionsrequiredbtn.addEventListener('click', (event) => {
+      this._optionsrequiredbtn.addEventListener('click', () => {
         this._openOptionsPage();
       });
 
       // button does a confirm step. It uses data-confirm to track it's stage.
       let savedbuttontext = '';
-      this._clipboardbtn.addEventListener('click', async (event) => {
+      this._clipboardbtn.addEventListener('click', async () => {
         try {
           const granted = await asycChromeExt.chromePermssionsRequest(['clipboardRead']);
           if (granted) {
             let confirmed = true;
             const clipboard = this._getClipboard();
 
-            if (clipboard.length > 5000) {  // todo: add setting to control this value.
+            if (clipboard.length > 5000) {  // todo: add setting to control this value. add check for goign over threshold
               const confirmeddata = this._clipboardbtn.getAttribute('data-confirm-stage') || '0';
               if (confirmeddata === '0') {
                 // swap the button to be a confirm.
