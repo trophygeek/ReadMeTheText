@@ -169,7 +169,7 @@ export const Settings = {
     pitch: 0.0,
     speakingRate: 1.0,
     languageCode: 'en-US',    // is just derived form voice_name?
-    testText: "Testing: 1, 2, 3",
+    testText: "Read text on a page using Google's high quality voices. Testing 1, 2, 3",   // default
     skipBackOnUnpause: 0.5,  // this is in seconds
 
     quota_size_warnings: true,

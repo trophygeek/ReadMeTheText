@@ -441,7 +441,7 @@ export const asycChromeExt = {
    * @param permissions_array {string[]}
    * @return {Promise<boolean>}
    */
-  chromePermssionsRequest(permissions_array) {
+  chromePermissionsRequest(permissions_array) {
     return new Promise(function (resolve, reject) {
       chrome.permissions.request(
           {permissions: permissions_array},
@@ -455,6 +455,21 @@ export const asycChromeExt = {
           });
     });
   },
+
+  /**
+   *
+   * @param permissions_array {string[]}
+   * @return {Promise<void>}
+   */
+  chromePermissionsRevoke(permissions_array) {
+    return new Promise(function (resolve, reject) {
+      chrome.permissions.remove(
+          {permissions: permissions_array},
+          function (granted) {
+            resolve();
+          });
+    });
+  }
 };
 
 

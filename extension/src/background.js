@@ -1,5 +1,5 @@
 'use strict';
-import {logerr, trace, PLAYBACKSTATE, CMD} from "./misc.js";
+import {logerr, trace, PLAYBACKSTATE, CMD, asycChromeExt} from "./misc.js";
 import {StateBus, Settings, QuotaTracker} from "./usersettings.js";
 import {TextToSpeech} from "./texttospeechclass.js";
 
@@ -326,6 +326,8 @@ chrome.runtime.onSuspend.addListener(async function () {
   trace('chrome.runtime.onSuspend');
   await Settings.init();
   await setToolbarIcon(PLAYBACKSTATE.IDLE);
+  // remove our permissions to read the clipboard. TODO: add setting to not reprompt
+  await asycChromeExt.chromePermissionsRevoke(['clipboardRead']);
   // chrome.browserAction.setBadgeText({text: "unload"});  // useful when debugging
 });
 

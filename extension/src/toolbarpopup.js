@@ -262,7 +262,7 @@ class Toolbarpopup {
       let savedbuttontext = '';
       this._clipboardbtn.addEventListener('click', async () => {
         try {
-          const granted = await asycChromeExt.chromePermssionsRequest(['clipboardRead']);
+          const granted = await asycChromeExt.chromePermissionsRequest(['clipboardRead']);
           if (granted) {
             let confirmed = true;
             const clipboard = this._getClipboard();
