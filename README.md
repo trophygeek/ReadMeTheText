@@ -46,7 +46,6 @@ Text-to-speech Speak-it demo
 You can install a Beta from the [Chrome Store](https://chrome.google.com/webstore/detail/readmethetext-beta/ohefbjijnlclhjfclaijbhnjaejeeeog)
 
 
-
 ## Project layout
 
 `packages.json` is only used to get the latest .ts (typescript) declaration files. These are used by modern IDEs to add basic type checking.
@@ -83,10 +82,12 @@ that is handle by Chrome's syncing mechanism and the API Key is NOT stored anywh
 |----------------|----------------------------|
 |`contextMenus`  | Can ONLY access selected text on a page when right-click menu item is selected.|
 |`   storage`    | Settings are saved and are synced across machines if Chrome is configured to do sync. Note: API key is NOT synced|
-|`clipboardRead` | Used to text-to-speech the contents of the clipboard. Useful when page take over right-click menu|
+|`clipboardRead` | _OPTIONAL_ Used to text-to-speech the contents of the clipboard. Useful when page take over right-click menu|
 |`content_security_policy`|   `style-src 'self' 'unsafe-inline'` Used to safely strip html when converting html -> text from clipboard |
 |`content_security_policy`|   `connect-src https://texttospeech.googleapis.com"` API call to google apis |
 
 
+## Contributing
+The source does *not* use any third party libraries to simplify privacy and security. All reactive UI is coded "by hand". Because extensions only needs to run in Chrome, the code uses the latest ES6 features and does not require any polyfill transpiling. Since users could use the extension to speak senesitve text, privacy should be a top priority. The addition of any Permissions must be optional and will likely be rejected.
 
 
